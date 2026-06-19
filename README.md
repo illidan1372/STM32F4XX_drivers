@@ -84,6 +84,7 @@ This project is being developed to gain a deep understanding of STM32 peripheral
 ├── test/
 ├── platformio.ini
 └── README.md
+```
 
 ## Disclaimer
 
