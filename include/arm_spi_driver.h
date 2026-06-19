@@ -1,5 +1,8 @@
 #include "stdint.h"
 #include "arm_stm32f446xx.h"
+
+#ifndef INC_ARM_SPI_DRIVER_H_
+#define INC_ARM_SPI_DRIVER_H_
 // this struct can be used to configure a SPI peripheral registers
 typedef struct
 {
@@ -86,3 +89,7 @@ void SPI_IRQ_priority_config(uint8_t IRQ_number , uint8_t priority);
 // @spi_clock_polarity / CPOL
 #define SPI_CPOL_LOW      0
 #define SPI_CPOL_HIGH     1
+
+
+
+#endif
