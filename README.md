@@ -70,13 +70,20 @@ This project is being developed to gain a deep understanding of STM32 peripheral
 
 ```text
 .
-├── drivers/
-│   ├── inc/
-│   └── src/
-├── examples/
-├── startup/
+├── include/              # Header files
+│   ├── arm_gpio_driver.h
+│   ├── arm_spi_driver.h
+│   ├── arm_stm32f446xx.h
+│   └── arm_nucleof446re.h
+├── src/                  # Source files
+│   ├── arm_gpio_driver.c
+│   ├── arm_spi_driver.c
+│   ├── arm_nucleof446re.c
+│   └── main.c
+├── lib/
+├── test/
+├── platformio.ini
 └── README.md
-```
 
 ## Disclaimer
 
