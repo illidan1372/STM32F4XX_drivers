@@ -235,8 +235,8 @@ void GPIO_IRQ_config(uint8_t IRQ_number , uint8_t state)
         
         }else {
                 if (IRQ_number <= 31) {
-                        if (IRQ_number <= 31) {
                         *NVIC_ICER0 |= (1 << IRQ_number);
+                        
                 
                 }else if (IRQ_number > 31 && IRQ_number < 64) {
                         uint32_t offset = (IRQ_number % 32);
@@ -248,7 +248,6 @@ void GPIO_IRQ_config(uint8_t IRQ_number , uint8_t state)
                 
                 }
         
-        }
     
 }
 }; 
