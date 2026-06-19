@@ -70,7 +70,7 @@
 
 //UARTx base addresses
 #define UART4_BASE_ADDR     ( APB1_BASE_ADDR  + 0x4C00 )
-#define UART5_BASE_ADDR     ( APB1_BASE_ADDR  + 0x4C00 )
+#define UART5_BASE_ADDR     ( APB1_BASE_ADDR  + 0x5000 )
 
 //RCC base address macro
 #define RCC_BASE_ADDR ( AHB1_BASE_ADDR + 0X3800 )
