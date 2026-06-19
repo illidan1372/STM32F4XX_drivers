@@ -61,7 +61,7 @@ This project is being developed to gain a deep understanding of STM32 peripheral
 * Portable driver architecture
 
 ## Build Environment
-
+* PlatformIO
 * GCC ARM Embedded Toolchain
 * OpenOCD
 * GDB
