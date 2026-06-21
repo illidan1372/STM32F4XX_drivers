@@ -64,58 +64,58 @@ void GPIO_IRQ_priority_config(uint8_t IRQ_number , uint8_t priority);
                                             // @GPIO_PIN_MODES
 
 // output mode
-#define GPIO_MODE_OUT   1
+#define GPIO_MODE_OUT   1U
 // input mode
-#define GPIO_MODE_IN    0
+#define GPIO_MODE_IN    0U
 // alternate function mode
-#define GPIO_MODE_ALTFN 2
+#define GPIO_MODE_ALTFN 2U
 // analog mode
-#define GPIO_MODE_ANLG  3
+#define GPIO_MODE_ANLG  3U
 // interrupt mode rising edge
-#define GPIO_MODE_IT_RE  5
+#define GPIO_MODE_IT_RE  5U
 // interrupt mode falling edge
-#define GPIO_MODE_IT_FE  4
+#define GPIO_MODE_IT_FE  4U
 // interrupt mode rising falling edge
-#define GPIO_MODE_IT_RFE 6
+#define GPIO_MODE_IT_RFE 6U
                                             // GPIO  output types
                                             //@GPIO_PIN_OUTPUT_TYPES
 
 // output push pull mode                                             
-#define GPIO_OT_TYPE_PP 0
+#define GPIO_OT_TYPE_PP 0U
 // output open drain mode                                             
-#define GPIO_OT_TYPE_OD 1
+#define GPIO_OT_TYPE_OD 1U
 
                                             // GPIO output speeds
                                             // @GPIO_SPEED
-#define GPIO_SPEED_LOW        0
-#define GPIO_SPEED_MEDIUM     1
-#define GPIO_SPEED_HIGH       2
-#define GPIO_SPEED_VERYHIGH   3
+#define GPIO_SPEED_LOW        0U
+#define GPIO_SPEED_MEDIUM     1U
+#define GPIO_SPEED_HIGH       2U
+#define GPIO_SPEED_VERYHIGH   3U
                                             //GPIO pull up and pull down conf macros
                                             //@GPIO_PUPD_CONTROL
                                             
-#define GPIO_NO_PUPD          0 // no pull up , pull down mode
-#define GPIO_PIN_PU           1 // pull up mode
-#define GPIO_PIN_PD           2 // pull down mode
+#define GPIO_NO_PUPD          0U // no pull up , pull down mode
+#define GPIO_PIN_PU           1U// pull up mode
+#define GPIO_PIN_PD           2U // pull down mode
 
                                             //GPIO pin numbers
                                             //@GPIO_PIN_NUMBERS
-#define PIN_NO_0              0
-#define PIN_NO_1              1
-#define PIN_NO_2              2
-#define PIN_NO_3              3
-#define PIN_NO_4              4
-#define PIN_NO_5              5
-#define PIN_NO_6              6
-#define PIN_NO_7              7
-#define PIN_NO_8              8
-#define PIN_NO_9              9
-#define PIN_NO_10             10
-#define PIN_NO_11             11
-#define PIN_NO_12             12
-#define PIN_NO_13             13
-#define PIN_NO_14             14
-#define PIN_NO_15             15
+#define PIN_NO_0              0U
+#define PIN_NO_1              1U
+#define PIN_NO_2              2U
+#define PIN_NO_3              3U
+#define PIN_NO_4              4U
+#define PIN_NO_5              5U
+#define PIN_NO_6              6U
+#define PIN_NO_7              7U
+#define PIN_NO_8              8U
+#define PIN_NO_9              9U
+#define PIN_NO_10             10U
+#define PIN_NO_11             11U
+#define PIN_NO_12             12U
+#define PIN_NO_13             13U
+#define PIN_NO_14             14U
+#define PIN_NO_15             15U
                                             //GPIO EXTI pin patterns numbers
                                             //@GPIO_EXTI_PATTERNS
 #define EXTI_GPIOA_PATTERN     0X0
