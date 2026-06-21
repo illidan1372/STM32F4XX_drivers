@@ -1,11 +1,13 @@
+#ifndef ARM_NUCLEOF446RE_H_
+#define ARM_NUCLEOF446RE_H_
+
 #include <stdint.h>
 #include "arm_stm32f446xx.h"
 #include "arm_gpio_driver.h"
 
                                             /* board specific peripheral pins*/
 
-#ifndef ARM_NUCLEOF446RE_H_
-#define ARM_NUCLEOF446RE_H_
+
 
 /* SPI1 - AF5 */
 #define SPI1_NSS_PORT      GPIOA
