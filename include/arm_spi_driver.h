@@ -1,8 +1,11 @@
-#include "stdint.h"
-#include "arm_stm32f446xx.h"
-
 #ifndef INC_ARM_SPI_DRIVER_H_
 #define INC_ARM_SPI_DRIVER_H_
+
+#include "stdint.h"
+#include "arm_stm32f446xx.h"
+#include <stdint.h>
+
+
 // this struct can be used to configure a SPI peripheral registers
 typedef struct
 {
@@ -40,6 +43,12 @@ void SPI_IRQ_config(uint8_t IRQ_number  , uint8_t state);
 void SPI_IRQ_handle(SPI_HANDLE_t *pSPI_handle);
 
 void SPI_IRQ_priority_config(uint8_t IRQ_number , uint8_t priority);
+
+// takes a SPIx(1,2,3 ,etc) and connects the physical pins on the board to MCU SPI ports
+// is automatically called by SPI_init() function
+// current pins are setup according to NUCLEO f446re board
+// you can change the ports and pins in arm_nucleof446re.h file
+void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
 
                                                                     /* SPI specific macros*/
 

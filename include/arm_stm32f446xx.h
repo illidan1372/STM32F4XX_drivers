@@ -25,6 +25,14 @@
 
 #define NVIC_PR_BASE_ADDR ((volatile uint32_t *)0xE000E400)
 
+
+// general macros
+
+#define ON   1
+#define OFF  0
+#define SET  1
+#define RESET 0
+
 // Memory base Addresses
 
 #define flash_base_addr 0x08000000U
