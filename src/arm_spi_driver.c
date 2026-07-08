@@ -234,12 +234,11 @@ if (device_mode == SPI_DEVICE_MODE_MASTER)
     switch (slave_select_mode)
     {
         case SPI_SSM_HARDWARE:
-            /* SSM = 0 */
             break;
 
         case SPI_SSM_SOFTWARE:
-            cr1_register |= (1U << 9);   /* SSM = 1 */
-            cr1_register |= (1U << 8);   /* SSI = 1 */
+            cr1_register |= (1U << 9);   
+            cr1_register |= (1U << 8);   
             break;
 
         default:
