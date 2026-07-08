@@ -71,8 +71,8 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
 
   // @spi_slave_select_modes
 
-#define SPI_SSM_SOFTWARE      1
-#define SPI_SSM_HARDWARE      0
+#define SPI_SSM_SOFTWARE      0
+#define SPI_SSM_HARDWARE      1
 
  // @spi_device_mode
 
