@@ -192,12 +192,13 @@ void GPIO_port_wt(GPIO_REGDEF_t *GPIO_port , uint16_t data)
  GPIO_port -> ODR = data;   
 }; 
 // a function to read from pin input
-uint8_t GPIO_pin_rd(GPIO_REGDEF_t *GPIO_port , uint8_t pin)
+uint8_t GPIO_pin_rd(GPIO_REGDEF_t *GPIO_port, uint8_t pin)
 {
- uint8_t register_contents =GPIO_port -> IDR;    
- uint8_t data = register_contents & (1 << pin);
- return data;  
-}; 
+    uint32_t register_contents = GPIO_port->IDR;
+    uint8_t data = (uint8_t)((register_contents >> pin) & 0x1U);
+
+    return data;
+}
 // a function to read the entire port 
 uint16_t GPIO_port_rd(GPIO_REGDEF_t *GPIO_port)
 {
