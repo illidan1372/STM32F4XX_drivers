@@ -29,6 +29,8 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
 
     if (pSPIx == SPI1)
     {
+        //enable GPIO clock 
+        GPIO_clk_cfg(GPIOA, 1U);
         spi_pin_config.gpio_pinaltfunmode = SPI1_AF;
 
         if (ssm == SPI_SSM_HARDWARE)
@@ -56,6 +58,7 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
     }
     else if (pSPIx == SPI2)
     {
+        GPIO_clk_cfg(GPIOB, 1U);
         spi_pin_config.gpio_pinaltfunmode = SPI2_AF;
 
         if (ssm == SPI_SSM_HARDWARE)
@@ -82,16 +85,20 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
         GPIO_init(&spi_pin_gpio_handle);
     }
     else if (pSPIx == SPI3)
-    {
-        spi_pin_config.gpio_pinaltfunmode = SPI3_AF;
+{
+    GPIO_clk_cfg(GPIOB, 1U);
 
-        if (ssm == SPI_SSM_HARDWARE)
-        {
-            spi_pin_config.gpio_pinnumber = SPI3_NSS_PIN;
-            spi_pin_gpio_handle.pGPIOx = SPI3_NSS_PORT;
-            spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-            GPIO_init(&spi_pin_gpio_handle);
-        }
+    spi_pin_config.gpio_pinaltfunmode = SPI3_AF;
+
+    if (ssm == SPI_SSM_HARDWARE)
+    {
+        GPIO_clk_cfg(GPIOA, 1U);
+
+        spi_pin_config.gpio_pinnumber = SPI3_NSS_PIN;
+        spi_pin_gpio_handle.pGPIOx = SPI3_NSS_PORT;
+        spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
+        GPIO_init(&spi_pin_gpio_handle);
+    }
 
         spi_pin_config.gpio_pinnumber = SPI3_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_MISO_PORT;
