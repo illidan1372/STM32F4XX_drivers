@@ -3,6 +3,8 @@
 #include "arm_gpio_driver.h"
 #include "arm_nucleof446re.h"
 #include <stdint.h>
+
+#define SPI_CR1_BIDIMODE_BIT 15U
 /**
  * @brief  This function takes a pointer to SPI register and connects the physical pins
  *         on your board to the internal MCU SPI peripheral.
@@ -206,7 +208,7 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
             break;
 
         case SPI_MODE_HALF_DUPLEX:
-            cr1_register |= (1U << 15);   /* BIDIMODE */
+            cr1_register |= (1U << SPI_CR1_BIDIMODE_BIT);
             break;
 
         case SPI_MODE_SIMPLEX_RX_ONLY:
