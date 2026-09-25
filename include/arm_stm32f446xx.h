@@ -212,6 +212,16 @@ typedef struct
 #define SPI_CR1_SSM_OFFSET 9U
 #define SPI_CR1_SSI_OFFSET 8U
 
+/* SPI_CR1 BR[2:0] occupies bits 5:3 */
+#define SPI_CR1_BR_DIV2    0b000000000U
+#define SPI_CR1_BR_DIV4    0b000001000U
+#define SPI_CR1_BR_DIV8    0b000010000U
+#define SPI_CR1_BR_DIV16   0b000011000U
+#define SPI_CR1_BR_DIV32   0b000100000U
+#define SPI_CR1_BR_DIV64   0b000101000U
+#define SPI_CR1_BR_DIV128  0b000110000U
+#define SPI_CR1_BR_DIV256  0b000111000U
+
 
 /*  peripheral definitions 
     these are macros that you can use in order to

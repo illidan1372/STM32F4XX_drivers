@@ -279,39 +279,34 @@ switch (data_frame_format) {
 110: fPCLK/128
 111: fPCLK/256
 */
-switch (clock_speed) {
-        case SPI_SCLK_DIV2:
-           break;
-        case SPI_SCLK_DIV4:
-           cr1_register |= (1U << 3);
-           break;
-        case SPI_SCLK_DIV8:
-           cr1_register |= (1U << 4);
-           break;
-        case SPI_SCLK_DIV16:
-           cr1_register |= (1U << 3);
-           cr1_register |= (1U << 4);
-           break;
-        case SPI_SCLK_DIV32:
-           cr1_register |= (1U << 5);
-           break;
-        case SPI_SCLK_DIV64:
-           cr1_register |= (1U << 3);
-           cr1_register |= (1U << 5);
-           break;
-         case SPI_SCLK_DIV128:
-           cr1_register |= (1U << 4);
-           cr1_register |= (1U << 5);
-           break;
-         case SPI_SCLK_DIV256:
-           cr1_register |= (1U << 3);
-           cr1_register |= (1U << 4);
-           cr1_register |= (1U << 5);
-           break;
-
-        default:
-           break;
-
+switch (clock_speed)
+{
+    case SPI_SCLK_DIV2:
+        cr1_register |= SPI_CR1_BR_DIV2;
+        break;
+    case SPI_SCLK_DIV4:
+        cr1_register |= SPI_CR1_BR_DIV4;
+        break;
+    case SPI_SCLK_DIV8:
+        cr1_register |= SPI_CR1_BR_DIV8;
+        break;
+    case SPI_SCLK_DIV16:
+        cr1_register |= SPI_CR1_BR_DIV16;
+        break;
+    case SPI_SCLK_DIV32:
+        cr1_register |= SPI_CR1_BR_DIV32;
+        break;
+    case SPI_SCLK_DIV64:
+        cr1_register |= SPI_CR1_BR_DIV64;
+        break;
+    case SPI_SCLK_DIV128:
+        cr1_register |= SPI_CR1_BR_DIV128;
+        break;
+    case SPI_SCLK_DIV256:
+        cr1_register |= SPI_CR1_BR_DIV256;
+        break;
+    default:
+        break;
 }
 
 
