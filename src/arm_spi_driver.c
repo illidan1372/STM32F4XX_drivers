@@ -211,7 +211,7 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
             break;
 
         case SPI_MODE_SIMPLEX_RX_ONLY:
-            cr1_register |= (1U << 10);   /* RXONLY */
+            cr1_register |= (1U << SPI_CR1_RXONLY_OFFSET);   /* RXONLY */
             break;
 
         default:

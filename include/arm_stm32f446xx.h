@@ -207,6 +207,7 @@ typedef struct
 
 /* SPI control register 1 bit positions */
 #define SPI_CR1_BIDIMODE_OFFSET 15U
+#define SPI_CR1_RXONLY_OFFSET 10U
 
 
 /*  peripheral definitions 
