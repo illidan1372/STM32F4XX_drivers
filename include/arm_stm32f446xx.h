@@ -211,6 +211,7 @@ typedef struct
 #define SPI_CR1_MSTR_OFFSET 2U
 #define SPI_CR1_SSM_OFFSET 9U
 #define SPI_CR1_SSI_OFFSET 8U
+#define SPI_CR1_DFF_OFFSET 11U
 
 
 /*  peripheral definitions 
