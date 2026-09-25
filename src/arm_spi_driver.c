@@ -4,7 +4,6 @@
 #include "arm_nucleof446re.h"
 #include <stdint.h>
 
-#define SPI_CR1_BIDIMODE_OFFSET 15U
 /**
  * @brief  This function takes a pointer to SPI register and connects the physical pins
  *         on your board to the internal MCU SPI peripheral.

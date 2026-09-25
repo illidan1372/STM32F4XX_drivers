@@ -205,6 +205,9 @@ typedef struct
     volatile uint32_t I2SPR;
 }SPI_REGDEF_t;
 
+/* SPI control register 1 bit positions */
+#define SPI_CR1_BIDIMODE_OFFSET 15U
+
 
 /*  peripheral definitions 
     these are macros that you can use in order to
