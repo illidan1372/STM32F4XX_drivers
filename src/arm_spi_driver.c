@@ -225,7 +225,7 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
 switch (device_mode)
 {
     case SPI_DEVICE_MODE_MASTER:
-        cr1_register |= (1U << 2);   /* MSTR = 1 */
+        cr1_register |= (1U << SPI_CR1_MSTR_OFFSET);   /* MSTR = 1 */
         break;
 
     case SPI_DEVICE_MODE_SLAVE:
