@@ -351,4 +351,7 @@ switch (clock_speed) {
 /* Connect board's pins to SPI pins of the MCU*/
 SPI_GPIO_pin_setup(spi_port, slave_select_mode);
 
+/* finally enable SPI*/
+spi_port->CR1 |= (1u << 6);
+
 }
