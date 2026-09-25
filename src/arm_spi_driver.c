@@ -258,7 +258,7 @@ if (device_mode == SPI_DEVICE_MODE_MASTER)
 
 switch (data_frame_format) {
         case SPI_DFF_16_BIT:
-           cr1_register |= (1U << 11);
+           cr1_register |= (1U << 11); /* CR1 DFF: 1 selects 16-bit frames; 0 selects 8-bit frames. */
            break;
         case SPI_DFF_8_BIT:
            break;
