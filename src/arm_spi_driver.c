@@ -245,8 +245,8 @@ if (device_mode == SPI_DEVICE_MODE_MASTER)
             break;
 
         case SPI_SSM_SOFTWARE:
-            cr1_register |= (1U << 9);   
-            cr1_register |= (1U << 8);   
+            cr1_register |= (1U << SPI_CR1_SSM_OFFSET);   
+            cr1_register |= (1U << SPI_CR1_SSI_OFFSET);   
             break;
 
         default:

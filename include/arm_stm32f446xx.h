@@ -209,6 +209,8 @@ typedef struct
 #define SPI_CR1_BIDIMODE_OFFSET 15U
 #define SPI_CR1_RXONLY_OFFSET 10U
 #define SPI_CR1_MSTR_OFFSET 2U
+#define SPI_CR1_SSM_OFFSET 9U
+#define SPI_CR1_SSI_OFFSET 8U
 
 
 /*  peripheral definitions 
