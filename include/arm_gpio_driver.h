@@ -4,6 +4,15 @@
 
 #include "arm_stm32f446xx.h"
 #include <stdint.h>
+
+/* GPIO driver operation result */
+typedef enum
+{
+    GPIO_OK = 0,
+    GPIO_ERROR_NULL_POINTER,
+    GPIO_ERROR_INVALID_PORT,
+    GPIO_ERROR_INVALID_CONFIG
+} GPIO_Status_t;
 /* configuration structure for a gpio pin */
 
 typedef struct  
