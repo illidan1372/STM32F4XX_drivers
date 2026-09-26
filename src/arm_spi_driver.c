@@ -419,3 +419,62 @@ else
 
 return SPI_OK;
 }
+
+/**
+ * @brief  Enable an initialized SPI peripheral.
+ *
+ *         Sets SPE in CR1 while preserving the existing SPI configuration.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    if (spi_port != SPI1 && spi_port != SPI2 &&
+        spi_port != SPI3 && spi_port != SPI4) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+
+    spi_port->CR1 |= (1U << SPI_CR1_SPE_OFFSET);
+
+    return SPI_OK;
+}
+
+
+/**
+ * @brief  Disable an SPI peripheral.
+ *
+ *         Clears SPE in CR1 while preserving the existing SPI configuration.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_disable(SPI_HANDLE_t *pSPIx)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    if (spi_port != SPI1 && spi_port != SPI2 &&
+        spi_port != SPI3 && spi_port != SPI4) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+
+    spi_port->CR1 &= ~(1U << SPI_CR1_SPE_OFFSET);
+
+    return SPI_OK;
+}
