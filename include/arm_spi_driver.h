@@ -5,6 +5,15 @@
 #include "arm_stm32f446xx.h"
 #include <stdint.h>
 
+/* SPI driver operation result */
+typedef enum
+{
+    SPI_OK = 0,
+    SPI_ERROR_NULL_POINTER,
+    SPI_ERROR_INVALID_PORT,
+    SPI_ERROR_INVALID_CONFIG
+} SPI_Status_t;
+
 
 // this struct can be used to configure a SPI peripheral registers
 typedef struct
