@@ -1,6 +1,7 @@
 #include "arm_gpio_driver.h"
 #include "arm_stm32f446xx.h"
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * @brief  This function takes a GPIO port name as well as state (0 or 1) and sets up the clock for that particular GPIO port 
@@ -53,14 +54,31 @@ void GPIO_clk_cfg(GPIO_REGDEF_t *GPIO_port , uint8_t state)
     }
 };                                                         
 /**
- * @brief  This function initialises a GPIO port according to the configuration criteria you pass to it 
+ * @brief  Configure a GPIO pin using the supplied handle.
  *
- * @param  pGPIOx  a pointer to a gpio_handle_t struct. you must declare and initialise it in your code and then pass it's address to this function
+ * @param  pGPIOx  Handle containing a GPIOA-GPIOH port and pin configuration.
+ *                The handle, its port, and its configuration must be non-null.
+ *                Pin numbers must be 0-15; modes must be supported GPIO modes.
  *
- * @return         none
+ * @return GPIO_OK on success, GPIO_ERROR_NULL_POINTER for a null pointer,
+ *         GPIO_ERROR_INVALID_PORT for an unsupported port, or
+ *         GPIO_ERROR_INVALID_CONFIG for an invalid pin number or mode.
  */ 
-void GPIO_init(gpio_handle_t *pGPIOx)
+GPIO_Status_t GPIO_init(gpio_handle_t *pGPIOx)
 {
+     if (pGPIOx == NULL || pGPIOx->gpio_pinconfig == NULL || pGPIOx->pGPIOx == NULL) {
+         return GPIO_ERROR_NULL_POINTER;
+     }
+     if (pGPIOx->pGPIOx != GPIOA && pGPIOx->pGPIOx != GPIOB &&
+         pGPIOx->pGPIOx != GPIOC && pGPIOx->pGPIOx != GPIOD &&
+         pGPIOx->pGPIOx != GPIOE && pGPIOx->pGPIOx != GPIOF &&
+         pGPIOx->pGPIOx != GPIOG && pGPIOx->pGPIOx != GPIOH) {
+         return GPIO_ERROR_INVALID_PORT;
+     }
+     if (pGPIOx->gpio_pinconfig->gpio_pinnumber > 15U ||
+         pGPIOx->gpio_pinconfig->gpio_pinmode > GPIO_MODE_IT_RFE) {
+         return GPIO_ERROR_INVALID_CONFIG;
+     }
      // if pin mode is less than or equal to analog  mode therefore none-interrupt mode
      // refer to @GPIO_PIN_MODES if unclear
      if (pGPIOx -> gpio_pinconfig -> gpio_pinmode <= GPIO_MODE_ANLG) {
@@ -146,7 +164,8 @@ void GPIO_init(gpio_handle_t *pGPIOx)
         EXTI->IMR |= (1 << pGPIOx ->gpio_pinconfig ->gpio_pinnumber);
 
      } 
-   
+
+     return GPIO_OK;
 }; 
 // a function to de-initialise gpio port
 void GPIO_deinit(GPIO_REGDEF_t *GPIO_port)

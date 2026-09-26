@@ -3,23 +3,34 @@
 #include "arm_gpio_driver.h"
 #include "arm_nucleof446re.h"
 #include <stdint.h>
+#include <stddef.h>
 
 /**
- * @brief  This function takes a pointer to SPI register and connects the physical pins
- *         on your board to the internal MCU SPI peripheral.
+ * @brief  Configure the board GPIO pins for SPI1, SPI2, or SPI3.
  *
- *         Default board pins for SPI1, SPI2, and SPI3 are selected according to the
- *         STM32 Nucleo-F446RE board configuration.
+ *         Pin selections come from arm_nucleof446re.h. GPIO clocks are enabled
+ *         and pins are configured for their SPI alternate function. NSS is
+ *         configured only when hardware slave select is requested.
  *
- *         You can change them in arm_nucleof446re.h to match your own board.
+ * @param  pSPIx  SPI1, SPI2, or SPI3 (non-null); SPI4 pins are unsupported.
+ * @param  ssm    SPI_SSM_HARDWARE or SPI_SSM_SOFTWARE.
  *
- * @param  pSPIx  SPI port, for example SPI1, SPI2, SPI3
- * @param  ssm    Slave select management mode
- *
- * @return none
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null port,
+ *         SPI_ERROR_INVALID_PORT for an unsupported SPI port, or
+ *         SPI_ERROR_INVALID_CONFIG for an invalid mode or GPIO setup failure.
  */
-void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
+SPI_Status_t SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
 {
+    if (pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
+    if (pSPIx != SPI1 && pSPIx != SPI2 && pSPIx != SPI3) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+    if (ssm != SPI_SSM_HARDWARE && ssm != SPI_SSM_SOFTWARE) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
     gpio_pinconfig_t spi_pin_config = {0};
     gpio_handle_t spi_pin_gpio_handle = {0};
 
@@ -39,23 +50,23 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
             spi_pin_config.gpio_pinnumber = SPI1_NSS_PIN;
             spi_pin_gpio_handle.pGPIOx = SPI1_NSS_PORT;
             spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-            GPIO_init(&spi_pin_gpio_handle);
+            if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
         }
 
         spi_pin_config.gpio_pinnumber = SPI1_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI1_MISO_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI1_MOSI_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI1_MOSI_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI1_SCK_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI1_SCK_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
     else if (pSPIx == SPI2)
     {
@@ -67,23 +78,23 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
             spi_pin_config.gpio_pinnumber = SPI2_NSS_PIN;
             spi_pin_gpio_handle.pGPIOx = SPI2_NSS_PORT;
             spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-            GPIO_init(&spi_pin_gpio_handle);
+            if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
         }
 
         spi_pin_config.gpio_pinnumber = SPI2_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI2_MISO_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI2_MOSI_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI2_MOSI_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI2_SCK_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI2_SCK_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
     else if (pSPIx == SPI3)
 {
@@ -98,37 +109,46 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
         spi_pin_config.gpio_pinnumber = SPI3_NSS_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_NSS_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
 
         spi_pin_config.gpio_pinnumber = SPI3_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_MISO_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI3_MOSI_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_MOSI_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI3_SCK_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_SCK_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
+    return SPI_OK;
 }
 
 
 /**
- * @brief  This function takes a SPI port name as well as state (0 or 1) and sets up the clock for that particular SPI port 
+ * @brief  Enable or disable the peripheral clock for SPI1-SPI4.
  *
- * @param  pSPIx  pointer to SPI peripheral register structure
- * @param  state  0 or 1 , to turn the clock on or off
+ * @param  pSPIx  SPI1, SPI2, SPI3, or SPI4 (non-null).
+ * @param  state  1 to enable the clock; 0 to disable it.
  *
- * @return        none
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null port,
+ *         SPI_ERROR_INVALID_PORT for an unsupported port, or
+ *         SPI_ERROR_INVALID_CONFIG for a state other than 0 or 1.
  */
-void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
+SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
 {
+    if (pSPIx == NULL) return SPI_ERROR_NULL_POINTER;
+    if (pSPIx != SPI1 && pSPIx != SPI2 && pSPIx != SPI3 && pSPIx != SPI4) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+    if (state != 0U && state != 1U) return SPI_ERROR_INVALID_CONFIG;
+
     if (state == 1)
     {
         if (pSPIx == SPI1)
@@ -167,19 +187,29 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
             SPI4_CLCKDI();
         }
     }
+    return SPI_OK;
 }
 
 
 /**
- * @brief  This function takes a pointer to SPI_HANDLE_t  and sets up a SPI port based on the options in that handle struct
+ * @brief  Configure SPI CR1 and the board GPIO pins from a handle.
  *
- * @param  pSPIx  pointer to SPI peripheral handle structure
+ *         Enables the SPI peripheral clock and configures GPIO pins, then writes
+ *         CR1 from a zero-valued local configuration. SPI remains disabled
+ *         (SPE = 0). If pin setup fails, the SPI clock may remain enabled.
  *
- * @return        none
+ * @param  pSPIx  Non-null handle with a non-null SPI port pointer. Board pin
+ *                setup currently supports SPI1-SPI3.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or port,
+ *         or the error status returned by SPI_clk_cfg or SPI_GPIO_pin_setup.
  */
 
- void SPI_init(SPI_HANDLE_t *pSPIx)
+ SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx)
 {
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
     SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
 
     uint8_t device_mode        = pSPIx->SPI_config.SPI_device_mode;
@@ -191,7 +221,8 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
     uint8_t slave_select_mode  = pSPIx->SPI_config.SPI_ssm;
 
     /* Enable peripheral clock */
-    SPI_clk_cfg(spi_port, 1);
+    SPI_Status_t status = SPI_clk_cfg(spi_port, 1U);
+    if (status != SPI_OK) return status;
 
     
     /* Local copy of CR1 configuration */
@@ -340,11 +371,12 @@ switch (clock_speed)
         break;
 }
 
+/* Connect board's pins to SPI pins of the MCU */
+status = SPI_GPIO_pin_setup(spi_port, slave_select_mode);
+if (status != SPI_OK) return status;
+
 // write the register to the actual hardware
- spi_port->CR1 = cr1_register;
+spi_port->CR1 = cr1_register;
 
-
-/* Connect board's pins to SPI pins of the MCU*/
-SPI_GPIO_pin_setup(spi_port, slave_select_mode);
-
+return SPI_OK;
 }

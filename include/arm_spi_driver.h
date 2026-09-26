@@ -37,9 +37,9 @@ typedef struct
 
 // a function to control the spi peripheral clock register
 // state means enable clock or disable clock
-void SPI_clk_cfg(SPI_REGDEF_t *pSPIx , uint8_t state);                                                         
+SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx , uint8_t state);                                                         
 // a function to initialise spi port 
-void SPI_init(SPI_HANDLE_t *pSPIx);
+SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx);
 // a function to de-initialise spi port
 void SPI_deinit(SPI_HANDLE_t *pSPIx);
 
@@ -57,7 +57,7 @@ void SPI_IRQ_priority_config(uint8_t IRQ_number , uint8_t priority);
 // is automatically called by SPI_init() function
 // current pins are setup according to NUCLEO f446re board
 // you can change the ports and pins in arm_nucleof446re.h file
-void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
+SPI_Status_t SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
 
                                                                     /* SPI specific macros*/
 
