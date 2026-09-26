@@ -229,12 +229,6 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
         return SPI_ERROR_INVALID_CONFIG;
     }
 
-    /* Software NSS for a slave is not configured by this driver yet. */
-    if (device_mode == SPI_DEVICE_MODE_SLAVE &&
-        slave_select_mode == SPI_SSM_SOFTWARE) {
-        return SPI_ERROR_INVALID_CONFIG;
-    }
-
     /* Configure bus mode */
     switch (bus_config)
     {
@@ -274,21 +268,18 @@ switch (device_mode)
 }
 
 /* Slave select management */
-if (device_mode == SPI_DEVICE_MODE_MASTER)
+switch (slave_select_mode)
 {
-    switch (slave_select_mode)
-    {
-        case SPI_SSM_HARDWARE:
-            break;
+    case SPI_SSM_HARDWARE:
+        break;
 
-        case SPI_SSM_SOFTWARE:
-            cr1_register |= (1U << SPI_CR1_SSM_OFFSET);   
-            cr1_register |= (1U << SPI_CR1_SSI_OFFSET);   
-            break;
+    case SPI_SSM_SOFTWARE:
+        cr1_register |= (1U << SPI_CR1_SSM_OFFSET);
+        cr1_register |= (1U << SPI_CR1_SSI_OFFSET);
+        break;
 
-        default:
-            return SPI_ERROR_INVALID_CONFIG;
-    }
+    default:
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
   /* Data frame format selection*/
