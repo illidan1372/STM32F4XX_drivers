@@ -39,7 +39,24 @@ typedef struct
 // a function to control the spi peripheral clock register
 // state means enable clock or disable clock
 SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx , uint8_t state);                                                         
-// a function to initialise spi port 
+/**
+ * @brief  Initialize an SPI peripheral from the supplied configuration.
+ *
+ *         Builds CR1 from the supplied configuration, configures hardware
+ *         NSS output behavior through SSOE in CR2, enables the peripheral
+ *         clock, and configures the required board GPIO pins.
+ *
+ *         The SPI peripheral remains disabled after initialization
+ *         (SPE = 0).
+ *
+ * @param  pSPIx  Non-null SPI handle containing a non-null SPI peripheral
+ *                pointer and a valid SPI configuration.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, SPI_ERROR_INVALID_CONFIG for an invalid or
+ *         incompatible configuration, or an error returned by clock/GPIO
+ *         configuration.
+ */
 SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx);
 // a function to de-initialise spi port
 void SPI_deinit(SPI_HANDLE_t *pSPIx);
