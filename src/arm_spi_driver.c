@@ -192,11 +192,12 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
 
 
 /**
- * @brief  Configure SPI CR1 and the board GPIO pins from a handle.
+ * @brief  Configure the SPI peripheral and board GPIO pins from a handle.
  *
- *         Enables the SPI peripheral clock and configures GPIO pins, then writes
- *         CR1 from a zero-valued local configuration. SPI remains disabled
- *         (SPE = 0). If pin setup fails, the SPI clock may remain enabled.
+ *         Builds CR1 from a zero-valued local configuration and updates the
+ *         SSOE bit in CR2. Enables the SPI peripheral clock and configures
+ *         the required GPIO pins. SPI remains disabled (SPE = 0).
+ *         If pin setup fails, the SPI clock may remain enabled.
  *
  * @param  pSPIx  Non-null handle with a non-null SPI port pointer. Board pin
  *                setup currently supports SPI1-SPI3.
@@ -235,13 +236,26 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
         return SPI_ERROR_INVALID_CONFIG;
     }
 
+    /*
+     * NSS output through SSOE is valid only when the peripheral is a master
+     * using hardware slave-select management.
+     */
+    if (nss_direction == SPI_NSS_OUTPUT &&
+        (device_mode != SPI_DEVICE_MODE_MASTER ||
+         slave_select_mode != SPI_SSM_HARDWARE))
+    {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
     /* Configure bus mode */
     switch (bus_config)
     {
         case SPI_MODE_FULL_DUPLEX:
+            /* BIDIMODE = 0, RXONLY = 0 */
             break;
 
         case SPI_MODE_SIMPLEX_TX_ONLY:
+            /* BIDIMODE = 0, RXONLY = 0; received data is ignored */
             break;
 
         case SPI_MODE_HALF_DUPLEX:
@@ -249,7 +263,7 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
             break;
 
         case SPI_MODE_SIMPLEX_RX_ONLY:
-            cr1_register |= (1U << SPI_CR1_RXONLY_OFFSET);   /* RXONLY */
+            cr1_register |= (1U << SPI_CR1_RXONLY_OFFSET);
             break;
 
         default:
@@ -292,9 +306,10 @@ switch (slave_select_mode)
 
 switch (data_frame_format) {
         case SPI_DFF_16_BIT:
-           cr1_register |= (1U << SPI_CR1_DFF_OFFSET); /* CR1 DFF: 1 selects 16-bit frames; 0 selects 8-bit frames. */
+           cr1_register |= (1U << SPI_CR1_DFF_OFFSET);
            break;
         case SPI_DFF_8_BIT:
+           /* DFF = 0 selects 8-bit data frames. */
            break;
 
         default:
@@ -349,10 +364,11 @@ switch (clock_speed)
     switch (clock_phase)
     {
         case SPI_CPHA_FIRST_EDGE :
+            /* CPHA = 0 */
             break;
 
         case SPI_CPHA_SECOND_EDGE:
-            cr1_register |= (1U << SPI_CR1_CPHA_OFFSET);   /* CPHA = 1 */
+            cr1_register |= (1U << SPI_CR1_CPHA_OFFSET);
             break;
 
         default:
@@ -363,11 +379,11 @@ switch (clock_speed)
    switch (clock_polarity)
 {
     case SPI_CPOL_LOW:
-        /* CPOL = 0 */
+        /* CPOL = 0: clock idles low. */
         break;
 
     case SPI_CPOL_HIGH:
-        cr1_register |= (1U << SPI_CR1_CPOL_OFFSET);   /* CPOL = 1 */
+        cr1_register |= (1U << SPI_CR1_CPOL_OFFSET);
         break;
 
     default:
