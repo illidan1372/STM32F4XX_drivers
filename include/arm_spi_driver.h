@@ -58,6 +58,34 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx , uint8_t state);
  *         configuration.
  */
 SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx);
+
+/**
+ * @brief  Enable an initialized SPI peripheral.
+ *
+ *         Sets the SPE bit in CR1 without changing the peripheral
+ *         configuration.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx);
+
+/**
+ * @brief  Disable an SPI peripheral.
+ *
+ *         Clears the SPE bit in CR1 without changing the peripheral
+ *         configuration.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_disable(SPI_HANDLE_t *pSPIx);
 // a function to de-initialise spi port
 void SPI_deinit(SPI_HANDLE_t *pSPIx);
 
