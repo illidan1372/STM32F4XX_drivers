@@ -246,8 +246,7 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
             break;
 
         default:
-            /* Invalid configuration */
-            break;
+            return SPI_ERROR_INVALID_CONFIG;
     }
 
     /* Remaining CR1 configuration goes here */
