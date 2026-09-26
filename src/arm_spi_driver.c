@@ -220,13 +220,20 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
     uint8_t clock_phase        = pSPIx->SPI_config.SPI_CPHA;
     uint8_t slave_select_mode  = pSPIx->SPI_config.SPI_ssm;
 
-    /* Enable peripheral clock */
-    SPI_Status_t status = SPI_clk_cfg(spi_port, 1U);
-    if (status != SPI_OK) return status;
 
-    
     /* Local copy of CR1 configuration */
     uint16_t cr1_register = 0;
+
+    if (slave_select_mode != SPI_SSM_HARDWARE &&
+        slave_select_mode != SPI_SSM_SOFTWARE) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    /* Software NSS for a slave is not configured by this driver yet. */
+    if (device_mode == SPI_DEVICE_MODE_SLAVE &&
+        slave_select_mode == SPI_SSM_SOFTWARE) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
 
     /* Configure bus mode */
     switch (bus_config)
@@ -263,7 +270,7 @@ switch (device_mode)
         break;
 
     default:
-        break;
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
 /* Slave select management */
@@ -280,7 +287,7 @@ if (device_mode == SPI_DEVICE_MODE_MASTER)
             break;
 
         default:
-            break;
+            return SPI_ERROR_INVALID_CONFIG;
     }
 }
 
@@ -294,7 +301,7 @@ switch (data_frame_format) {
            break;
 
         default:
-           break;
+           return SPI_ERROR_INVALID_CONFIG;
 
 }
 
@@ -336,7 +343,7 @@ switch (clock_speed)
         cr1_register |= SPI_CR1_BR_DIV256;
         break;
     default:
-        break;
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
 
@@ -352,7 +359,7 @@ switch (clock_speed)
             break;
 
         default:
-            break;
+            return SPI_ERROR_INVALID_CONFIG;
     }
    /*clock polarity setup*/
 
@@ -367,8 +374,12 @@ switch (clock_speed)
         break;
 
     default:
-        break;
+        return SPI_ERROR_INVALID_CONFIG;
 }
+
+/* Enable the SPI clock only after validating configuration values. */
+SPI_Status_t status = SPI_clk_cfg(spi_port, 1U);
+if (status != SPI_OK) return status;
 
 /* Connect board's pins to SPI pins of the MCU */
 status = SPI_GPIO_pin_setup(spi_port, slave_select_mode);
