@@ -451,9 +451,12 @@ SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx)
 
 
 /**
- * @brief  Disable an SPI peripheral.
+ * @brief  Clear the SPI peripheral enable bit.
  *
  *         Clears SPE in CR1 while preserving the existing SPI configuration.
+ *         This function does not currently perform the transfer-completion
+ *         checks required for safely disabling an active SPI communication.
+ *         The caller must ensure that no transfer is in progress.
  *
  * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
  *
