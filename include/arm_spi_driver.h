@@ -74,10 +74,13 @@ SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx);
 SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx);
 
 /**
- * @brief  Disable an SPI peripheral.
+ * @brief  Clear the SPI peripheral enable bit.
  *
  *         Clears the SPE bit in CR1 without changing the peripheral
- *         configuration.
+ *         configuration. This function does not currently perform the
+ *         transfer-completion checks required for safely disabling an active
+ *         SPI communication. The caller must ensure that no transfer is in
+ *         progress.
  *
  * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
  *
