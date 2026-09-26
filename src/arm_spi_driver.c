@@ -219,6 +219,7 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
     uint8_t clock_polarity     = pSPIx->SPI_config.SPI_CPOL;
     uint8_t clock_phase        = pSPIx->SPI_config.SPI_CPHA;
     uint8_t slave_select_mode  = pSPIx->SPI_config.SPI_ssm;
+    uint8_t nss_direction      = pSPIx->SPI_config.SPI_ssoe;
 
 
     /* Local copy of CR1 configuration */
@@ -226,6 +227,11 @@ SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
 
     if (slave_select_mode != SPI_SSM_HARDWARE &&
         slave_select_mode != SPI_SSM_SOFTWARE) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    if (nss_direction != SPI_NSS_INPUT &&
+        nss_direction != SPI_NSS_OUTPUT) {
         return SPI_ERROR_INVALID_CONFIG;
     }
 
@@ -378,6 +384,22 @@ if (status != SPI_OK) return status;
 
 // write the register to the actual hardware
 spi_port->CR1 = cr1_register;
+
+/*
+ * In master mode with hardware NSS management, SSOE selects whether
+ * the NSS pin is driven as an output. In all other configurations,
+ * keep NSS output disabled.
+ */
+if (device_mode == SPI_DEVICE_MODE_MASTER &&
+    slave_select_mode == SPI_SSM_HARDWARE &&
+    nss_direction == SPI_NSS_OUTPUT)
+{
+    spi_port->CR2 |= (1U << SPI_CR2_SSOE_OFFSET);
+}
+else
+{
+    spi_port->CR2 &= ~(1U << SPI_CR2_SSOE_OFFSET);
+}
 
 return SPI_OK;
 }
