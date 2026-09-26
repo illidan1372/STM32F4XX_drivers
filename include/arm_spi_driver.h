@@ -25,6 +25,7 @@ typedef struct
     uint8_t SPI_CPOL;
     uint8_t SPI_CPHA;
     uint8_t SPI_ssm;
+    uint8_t SPI_ssoe;
 
 }SPI_CONFIG_t ;
 
@@ -82,6 +83,11 @@ SPI_Status_t SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
 
 #define SPI_SSM_SOFTWARE      0
 #define SPI_SSM_HARDWARE      1
+
+// @spi_nss_direction
+
+#define SPI_NSS_INPUT          0
+#define SPI_NSS_OUTPUT         1
 
  // @spi_device_mode
 
