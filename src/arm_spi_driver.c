@@ -292,7 +292,7 @@ switch (slave_select_mode)
 
 switch (data_frame_format) {
         case SPI_DFF_16_BIT:
-           cr1_register |= (1U << 11); /* CR1 DFF: 1 selects 16-bit frames; 0 selects 8-bit frames. */
+           cr1_register |= (1U << SPI_CR1_DFF_OFFSET); /* CR1 DFF: 1 selects 16-bit frames; 0 selects 8-bit frames. */
            break;
         case SPI_DFF_8_BIT:
            break;
@@ -352,7 +352,7 @@ switch (clock_speed)
             break;
 
         case SPI_CPHA_SECOND_EDGE:
-            cr1_register |= (1U << 0);   /* CPHA = 1 */
+            cr1_register |= (1U << SPI_CR1_CPHA_OFFSET);   /* CPHA = 1 */
             break;
 
         default:
@@ -367,7 +367,7 @@ switch (clock_speed)
         break;
 
     case SPI_CPOL_HIGH:
-        cr1_register |= (1U << 1);   /* CPOL = 1 */
+        cr1_register |= (1U << SPI_CR1_CPOL_OFFSET);   /* CPOL = 1 */
         break;
 
     default:
