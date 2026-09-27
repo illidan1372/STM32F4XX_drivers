@@ -484,3 +484,34 @@ SPI_Status_t SPI_disable(SPI_HANDLE_t *pSPIx)
 
     return SPI_OK;
 }
+
+
+static SPI_Status_t SPI_set_half_duplex_direction(SPI_HANDLE_t *pSPIx,
+                                                   SPI_Direction_t direction)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL)
+    {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    if (pSPIx->SPI_config.SPI_bus_config != SPI_MODE_HALF_DUPLEX)
+    {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    switch (direction)
+    {
+        case SPI_DIRECTION_TX:
+            pSPIx->pSPIx->CR1 |= (1U << SPI_CR1_BIDIOE_OFFSET);
+            break;
+
+        case SPI_DIRECTION_RX:
+            pSPIx->pSPIx->CR1 &= ~(1U << SPI_CR1_BIDIOE_OFFSET);
+            break;
+
+        default:
+            return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    return SPI_OK;
+}
