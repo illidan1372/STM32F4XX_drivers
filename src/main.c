@@ -83,19 +83,19 @@ int main(void){
 
     while (1) {
 
-        if (is_equal == 0) {
+    if (is_equal == 0) {
 
-            user_LED_toggle();
+        user_LED_toggle();
 
-            for (volatile int i = 0; i < 10000000; i++) {
-                ;
-            }
-
-        } else
-        {
-            user_LED_toggle();
+        for (volatile int i = 0; i < 10000000; i++) {
+            ;
         }
+
+    } else {
+
+        usr_LED_set(1);
     }
+}
 
 
 };
