@@ -623,3 +623,102 @@ SPI_Status_t SPI_data_exchange(SPI_HANDLE_t *pSPIx,
             return SPI_ERROR_INVALID_OPERATION;
     }
 }
+
+
+static SPI_Status_t SPI_tx(SPI_HANDLE_t *pSPIx,
+                           const uint8_t *pTxBuffer,
+                           uint32_t length)
+{
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    while (length > 0U)
+    {
+        while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+        {
+        }
+
+        *((volatile uint8_t *)&spi_port->DR) = *pTxBuffer;
+
+        pTxBuffer++;
+        length--;
+    }
+
+    while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+    {
+    }
+
+    while (spi_port->SR & (1U << SPI_SR_BSY_OFFSET))
+    {
+    }
+
+    if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_FULL_DUPLEX)
+    {
+        volatile uint32_t clear_ovr;
+
+        clear_ovr = spi_port->DR;
+        clear_ovr = spi_port->SR;
+        (void)clear_ovr;
+    }
+
+    return SPI_OK;
+}
+
+
+static SPI_Status_t SPI_rx(SPI_HANDLE_t *pSPIx,
+                           uint8_t *pRxBuffer,
+                           uint32_t length)
+{
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    while (length > 0U)
+    {
+        while (!(spi_port->SR & (1U << SPI_SR_RXNE_OFFSET)))
+        {
+        }
+
+        *pRxBuffer = *((volatile uint8_t *)&spi_port->DR);
+
+        pRxBuffer++;
+        length--;
+    }
+
+    return SPI_OK;
+}
+
+
+static SPI_Status_t SPI_exchange(SPI_HANDLE_t *pSPIx,
+                                 const uint8_t *pTxBuffer,
+                                 uint8_t *pRxBuffer,
+                                 uint32_t length)
+{
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    while (length > 0U)
+    {
+        while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+        {
+        }
+
+        *((volatile uint8_t *)&spi_port->DR) = *pTxBuffer;
+
+        while (!(spi_port->SR & (1U << SPI_SR_RXNE_OFFSET)))
+        {
+        }
+
+        *pRxBuffer = *((volatile uint8_t *)&spi_port->DR);
+
+        pTxBuffer++;
+        pRxBuffer++;
+        length--;
+    }
+
+    while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+    {
+    }
+
+    while (spi_port->SR & (1U << SPI_SR_BSY_OFFSET))
+    {
+    }
+
+    return SPI_OK;
+}

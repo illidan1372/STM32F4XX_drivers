@@ -217,6 +217,12 @@ typedef struct
 #define SPI_CR1_CPOL_OFFSET 1U
 #define SPI_CR1_CPHA_OFFSET 0U
 
+/* SPI status register bit positions */
+#define SPI_SR_BSY_OFFSET 7U
+#define SPI_SR_OVR_OFFSET 6U
+#define SPI_SR_TXE_OFFSET 1U
+#define SPI_SR_RXNE_OFFSET 0U
+
 /* SPI control register 2 bit positions */
 #define SPI_CR2_SSOE_OFFSET 2U
 
