@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
+static SPI_Status_t SPI_set_half_duplex_direction(SPI_HANDLE_t *pSPIx,
+                                                   SPI_Direction_t direction);
+
 /**
  * @brief  Configure the board GPIO pins for SPI1, SPI2, or SPI3.
  *
