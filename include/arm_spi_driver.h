@@ -33,14 +33,16 @@ typedef enum
 // this struct can be used to configure a SPI peripheral registers
 typedef struct
 {
-    uint8_t SPI_device_mode;
-    uint8_t SPI_bus_config;
-    uint8_t SPI_SCLK_speed;
-    uint8_t SPI_dff;
-    uint8_t SPI_CPOL;
-    uint8_t SPI_CPHA;
-    uint8_t SPI_ssm;
-    uint8_t SPI_ssoe;
+    uint8_t SPI_device_mode;  /* SPI_DEVICE_MODE_SLAVE / SPI_DEVICE_MODE_MASTER */
+    uint8_t SPI_bus_config;   /* SPI_MODE_FULL_DUPLEX / SPI_MODE_HALF_DUPLEX /
+                                 SPI_MODE_SIMPLEX_RX_ONLY / SPI_MODE_SIMPLEX_TX_ONLY */
+    uint8_t SPI_SCLK_speed;   /* SPI_SCLK_DIV2 / DIV4 / DIV8 / DIV16 /
+                                 DIV32 / DIV64 / DIV128 / DIV256 */
+    uint8_t SPI_dff;          /* SPI_DFF_8_BIT / SPI_DFF_16_BIT */
+    uint8_t SPI_CPOL;         /* SPI_CPOL_LOW / SPI_CPOL_HIGH */
+    uint8_t SPI_CPHA;         /* SPI_CPHA_FIRST_EDGE / SPI_CPHA_SECOND_EDGE */
+    uint8_t SPI_ssm;          /* SPI_SSM_SOFTWARE / SPI_SSM_HARDWARE */
+    uint8_t SPI_ssoe;         /* SPI_NSS_INPUT / SPI_NSS_OUTPUT */
 
 }SPI_CONFIG_t ;
 
