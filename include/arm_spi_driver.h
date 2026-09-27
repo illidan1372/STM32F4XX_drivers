@@ -102,6 +102,12 @@ SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx);
  *         peripheral.
  */
 SPI_Status_t SPI_disable(SPI_HANDLE_t *pSPIx);
+
+SPI_Status_t SPI_data_exchange(SPI_HANDLE_t *pSPIx,
+                               SPI_Operation_t operation,
+                               const uint8_t *pTxBuffer,
+                               uint8_t *pRxBuffer,
+                               uint32_t length);
 // a function to de-initialise spi port
 void SPI_deinit(SPI_HANDLE_t *pSPIx);
 
