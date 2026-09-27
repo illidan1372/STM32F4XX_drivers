@@ -528,3 +528,98 @@ static SPI_Status_t SPI_set_half_duplex_direction(SPI_HANDLE_t *pSPIx,
 
     return SPI_OK;
 }
+
+
+SPI_Status_t SPI_data_exchange(SPI_HANDLE_t *pSPIx,
+                               SPI_Operation_t operation,
+                               const uint8_t *pTxBuffer,
+                               uint8_t *pRxBuffer,
+                               uint32_t length)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL)
+    {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    if (pSPIx->SPI_config.SPI_dff == SPI_DFF_16_BIT)
+    {
+        return SPI_ERROR_UNSUPPORTED;
+    }
+
+    if (pSPIx->SPI_config.SPI_dff != SPI_DFF_8_BIT)
+    {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    switch (operation)
+    {
+        case SPI_OPERATION_TX:
+            if (pTxBuffer == NULL)
+            {
+                return SPI_ERROR_NULL_POINTER;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_SIMPLEX_RX_ONLY)
+            {
+                return SPI_ERROR_INVALID_OPERATION;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_HALF_DUPLEX)
+            {
+                SPI_Status_t status =
+                    SPI_set_half_duplex_direction(pSPIx, SPI_DIRECTION_TX);
+
+                if (status != SPI_OK)
+                {
+                    return status;
+                }
+            }
+
+            return SPI_tx(pSPIx, pTxBuffer, length);
+
+        case SPI_OPERATION_RX:
+            if (pRxBuffer == NULL)
+            {
+                return SPI_ERROR_NULL_POINTER;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_SIMPLEX_TX_ONLY)
+            {
+                return SPI_ERROR_INVALID_OPERATION;
+            }
+
+            if (pSPIx->SPI_config.SPI_device_mode == SPI_DEVICE_MODE_MASTER)
+            {
+                return SPI_ERROR_UNSUPPORTED;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_HALF_DUPLEX)
+            {
+                SPI_Status_t status =
+                    SPI_set_half_duplex_direction(pSPIx, SPI_DIRECTION_RX);
+
+                if (status != SPI_OK)
+                {
+                    return status;
+                }
+            }
+
+            return SPI_rx(pSPIx, pRxBuffer, length);
+
+        case SPI_OPERATION_EXCHANGE:
+            if (pTxBuffer == NULL || pRxBuffer == NULL)
+            {
+                return SPI_ERROR_NULL_POINTER;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config != SPI_MODE_FULL_DUPLEX)
+            {
+                return SPI_ERROR_INVALID_OPERATION;
+            }
+
+            return SPI_exchange(pSPIx, pTxBuffer, pRxBuffer, length);
+
+        default:
+            return SPI_ERROR_INVALID_OPERATION;
+    }
+}
