@@ -8,6 +8,19 @@
 static SPI_Status_t SPI_set_half_duplex_direction(SPI_HANDLE_t *pSPIx,
                                                    SPI_Direction_t direction);
 
+static SPI_Status_t SPI_tx(SPI_HANDLE_t *pSPIx,
+                           const uint8_t *pTxBuffer,
+                           uint32_t length);
+
+static SPI_Status_t SPI_rx(SPI_HANDLE_t *pSPIx,
+                           uint8_t *pRxBuffer,
+                           uint32_t length);
+
+static SPI_Status_t SPI_exchange(SPI_HANDLE_t *pSPIx,
+                                 const uint8_t *pTxBuffer,
+                                 uint8_t *pRxBuffer,
+                                 uint32_t length);
+
 /**
  * @brief  Configure the board GPIO pins for SPI1, SPI2, or SPI3.
  *
