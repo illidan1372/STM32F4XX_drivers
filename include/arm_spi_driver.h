@@ -14,6 +14,19 @@ typedef enum
     SPI_ERROR_INVALID_CONFIG
 } SPI_Status_t;
 
+typedef enum
+{
+    SPI_DIRECTION_RX,
+    SPI_DIRECTION_TX
+} SPI_Direction_t;
+
+typedef enum
+{
+    SPI_OPERATION_TX,
+    SPI_OPERATION_RX,
+    SPI_OPERATION_EXCHANGE
+} SPI_Operation_t;
+
 
 // this struct can be used to configure a SPI peripheral registers
 typedef struct
