@@ -93,7 +93,7 @@ int main(void){
 
     } else {
 
-        usr_LED_set(1);
+        user_LED_set(1);
     }
 }
 
