@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "arm_gpio_driver.h"
-void usr_LED_set(uint8_t state)
+void user_LED_set(uint8_t state)
 {
      GPIO_clk_cfg(GPIOA,1);
      gpio_pinconfig_t gpio_conf = {PIN_NO_5 , GPIO_MODE_OUT};

@@ -205,6 +205,37 @@ typedef struct
     volatile uint32_t I2SPR;
 }SPI_REGDEF_t;
 
+/* SPI control register 1 bit positions */
+#define SPI_CR1_BIDIMODE_OFFSET 15U
+#define SPI_CR1_BIDIOE_OFFSET 14U
+#define SPI_CR1_DFF_OFFSET 11U
+#define SPI_CR1_RXONLY_OFFSET 10U
+#define SPI_CR1_SSM_OFFSET 9U
+#define SPI_CR1_SSI_OFFSET 8U
+#define SPI_CR1_SPE_OFFSET 6U
+#define SPI_CR1_MSTR_OFFSET 2U
+#define SPI_CR1_CPOL_OFFSET 1U
+#define SPI_CR1_CPHA_OFFSET 0U
+
+/* SPI status register bit positions */
+#define SPI_SR_BSY_OFFSET 7U
+#define SPI_SR_OVR_OFFSET 6U
+#define SPI_SR_TXE_OFFSET 1U
+#define SPI_SR_RXNE_OFFSET 0U
+
+/* SPI control register 2 bit positions */
+#define SPI_CR2_SSOE_OFFSET 2U
+
+/* SPI_CR1 BR[2:0] occupies bits 5:3 */
+#define SPI_CR1_BR_DIV2    0b000000000U
+#define SPI_CR1_BR_DIV4    0b000001000U
+#define SPI_CR1_BR_DIV8    0b000010000U
+#define SPI_CR1_BR_DIV16   0b000011000U
+#define SPI_CR1_BR_DIV32   0b000100000U
+#define SPI_CR1_BR_DIV64   0b000101000U
+#define SPI_CR1_BR_DIV128  0b000110000U
+#define SPI_CR1_BR_DIV256  0b000111000U
+
 
 /*  peripheral definitions 
     these are macros that you can use in order to

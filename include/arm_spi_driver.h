@@ -5,17 +5,44 @@
 #include "arm_stm32f446xx.h"
 #include <stdint.h>
 
+/* SPI driver operation result */
+typedef enum
+{
+    SPI_OK = 0,
+    SPI_ERROR_NULL_POINTER,
+    SPI_ERROR_INVALID_PORT,
+    SPI_ERROR_INVALID_CONFIG,
+    SPI_ERROR_INVALID_OPERATION,
+    SPI_ERROR_UNSUPPORTED
+} SPI_Status_t;
+
+typedef enum
+{
+    SPI_DIRECTION_RX,
+    SPI_DIRECTION_TX
+} SPI_Direction_t;
+
+typedef enum
+{
+    SPI_OPERATION_TX,
+    SPI_OPERATION_RX,
+    SPI_OPERATION_EXCHANGE
+} SPI_Operation_t;
+
 
 // this struct can be used to configure a SPI peripheral registers
 typedef struct
 {
-    uint8_t SPI_device_mode;
-    uint8_t SPI_bus_config;
-    uint8_t SPI_SCLK_speed;
-    uint8_t SPI_dff;
-    uint8_t SPI_CPOL;
-    uint8_t SPI_CPHA;
-    uint8_t SPI_ssm;
+    uint8_t SPI_device_mode;  /* SPI_DEVICE_MODE_SLAVE / SPI_DEVICE_MODE_MASTER */
+    uint8_t SPI_bus_config;   /* SPI_MODE_FULL_DUPLEX / SPI_MODE_HALF_DUPLEX /
+                                 SPI_MODE_SIMPLEX_RX_ONLY / SPI_MODE_SIMPLEX_TX_ONLY */
+    uint8_t SPI_SCLK_speed;   /* SPI_SCLK_DIV2 / DIV4 / DIV8 / DIV16 /
+                                 DIV32 / DIV64 / DIV128 / DIV256 */
+    uint8_t SPI_dff;          /* SPI_DFF_8_BIT / SPI_DFF_16_BIT */
+    uint8_t SPI_CPOL;         /* SPI_CPOL_LOW / SPI_CPOL_HIGH */
+    uint8_t SPI_CPHA;         /* SPI_CPHA_FIRST_EDGE / SPI_CPHA_SECOND_EDGE */
+    uint8_t SPI_ssm;          /* SPI_SSM_SOFTWARE / SPI_SSM_HARDWARE */
+    uint8_t SPI_ssoe;         /* SPI_NSS_INPUT / SPI_NSS_OUTPUT */
 
 }SPI_CONFIG_t ;
 
@@ -28,9 +55,63 @@ typedef struct
 
 // a function to control the spi peripheral clock register
 // state means enable clock or disable clock
-void SPI_clk_cfg(SPI_REGDEF_t *pSPIx , uint8_t state);                                                         
-// a function to initialise spi port 
-void SPI_init(SPI_HANDLE_t *pSPIx);
+SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx , uint8_t state);                                                         
+/**
+ * @brief  Initialize an SPI peripheral from the supplied configuration.
+ *
+ *         Builds CR1 from the supplied configuration, configures hardware
+ *         NSS output behavior through SSOE in CR2, enables the peripheral
+ *         clock, and configures the required board GPIO pins.
+ *
+ *         The SPI peripheral remains disabled after initialization
+ *         (SPE = 0).
+ *
+ * @param  pSPIx  Non-null SPI handle containing a non-null SPI peripheral
+ *                pointer and a valid SPI configuration.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, SPI_ERROR_INVALID_CONFIG for an invalid or
+ *         incompatible configuration, or an error returned by clock/GPIO
+ *         configuration.
+ */
+SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx);
+
+/**
+ * @brief  Enable an initialized SPI peripheral.
+ *
+ *         Sets the SPE bit in CR1 without changing the peripheral
+ *         configuration.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx);
+
+/**
+ * @brief  Clear the SPI peripheral enable bit.
+ *
+ *         Clears the SPE bit in CR1 without changing the peripheral
+ *         configuration. This function does not currently perform the
+ *         transfer-completion checks required for safely disabling an active
+ *         SPI communication. The caller must ensure that no transfer is in
+ *         progress.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_disable(SPI_HANDLE_t *pSPIx);
+
+SPI_Status_t SPI_data_exchange(SPI_HANDLE_t *pSPIx,
+                               SPI_Operation_t operation,
+                               const uint8_t *pTxBuffer,
+                               uint8_t *pRxBuffer,
+                               uint32_t length);
 // a function to de-initialise spi port
 void SPI_deinit(SPI_HANDLE_t *pSPIx);
 
@@ -48,7 +129,7 @@ void SPI_IRQ_priority_config(uint8_t IRQ_number , uint8_t priority);
 // is automatically called by SPI_init() function
 // current pins are setup according to NUCLEO f446re board
 // you can change the ports and pins in arm_nucleof446re.h file
-void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
+SPI_Status_t SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
 
                                                                     /* SPI specific macros*/
 
@@ -73,6 +154,11 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx , uint8_t ssm);
 
 #define SPI_SSM_SOFTWARE      0
 #define SPI_SSM_HARDWARE      1
+
+// @spi_nss_direction
+
+#define SPI_NSS_INPUT          0
+#define SPI_NSS_OUTPUT         1
 
  // @spi_device_mode
 

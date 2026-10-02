@@ -10,7 +10,8 @@ This project is being developed to gain a deep understanding of STM32 peripheral
 
 * Memory map definitions
 * Peripheral base address definitions
-* RCC register definitions
+* RCC register mapping and peripheral clock-gating macros
+
 * GPIO driver
 
   * GPIO initialization
@@ -21,29 +22,55 @@ This project is being developed to gain a deep understanding of STM32 peripheral
   * GPIO pull-up/pull-down configuration
   * GPIO alternate function configuration
   * GPIO read/write APIs
+  * GPIO status/error handling
 
-### In Progress
-
-* SPI driver
+* SPI blocking driver
 
   * Peripheral register mapping
-  * Clock control
+  * Peripheral clock control
   * SPI initialization
+  * SPI enable/disable
   * Master/slave configuration
-  * Bus mode configuration
+  * Full-duplex configuration
+  * Half-duplex configuration and direction control
+  * Simplex TX/RX configuration
   * Clock prescaler configuration
   * CPOL/CPHA configuration
-  * Data frame format configuration
-  * Software slave management
+  * 8-bit data frame support
+  * Software and hardware slave-select management
+  * Hardware NSS output control
+  * Blocking transmit API
+  * Blocking receive API
+  * Blocking full-duplex exchange API
+  * SPI status/error handling
+  * SPI1 full-duplex hardware loopback test
+
+### In Progress / Next
+
+* RCC clock-tree driver
+
+  * HSI clock source configuration
+  * HSE clock source configuration
+  * PLL configuration
+  * System clock source selection
+  * SYSCLK frequency configuration
+  * AHB clock configuration
+  * APB1 clock configuration
+  * APB2 clock configuration
+  * Requested-frequency validation
+  * Invalid-configuration handling without modifying the active clock tree
+  * Clock-frequency query APIs
 
 ### Planned
 
-* SPI transmit/receive APIs
 * SPI interrupt mode
 * SPI DMA support
+* USART/UART driver
 * I2C driver
-* USART driver
-* Timer driver
+* Timer/PWM driver
+* ADC driver
+* DMA driver
+* CAN driver
 * Example applications
 
 ## Target Hardware

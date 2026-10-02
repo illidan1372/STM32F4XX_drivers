@@ -3,22 +3,50 @@
 #include "arm_gpio_driver.h"
 #include "arm_nucleof446re.h"
 #include <stdint.h>
+#include <stddef.h>
+
+static SPI_Status_t SPI_set_half_duplex_direction(SPI_HANDLE_t *pSPIx,
+                                                   SPI_Direction_t direction);
+
+static SPI_Status_t SPI_tx(SPI_HANDLE_t *pSPIx,
+                           const uint8_t *pTxBuffer,
+                           uint32_t length);
+
+static SPI_Status_t SPI_rx(SPI_HANDLE_t *pSPIx,
+                           uint8_t *pRxBuffer,
+                           uint32_t length);
+
+static SPI_Status_t SPI_exchange(SPI_HANDLE_t *pSPIx,
+                                 const uint8_t *pTxBuffer,
+                                 uint8_t *pRxBuffer,
+                                 uint32_t length);
+
 /**
- * @brief  This function takes a pointer to SPI register and connects the physical pins
- *         on your board to the internal MCU SPI peripheral.
+ * @brief  Configure the board GPIO pins for SPI1, SPI2, or SPI3.
  *
- *         Default board pins for SPI1, SPI2, and SPI3 are selected according to the
- *         STM32 Nucleo-F446RE board configuration.
+ *         Pin selections come from arm_nucleof446re.h. GPIO clocks are enabled
+ *         and pins are configured for their SPI alternate function. NSS is
+ *         configured only when hardware slave select is requested.
  *
- *         You can change them in arm_nucleof446re.h to match your own board.
+ * @param  pSPIx  SPI1, SPI2, or SPI3 (non-null); SPI4 pins are unsupported.
+ * @param  ssm    SPI_SSM_HARDWARE or SPI_SSM_SOFTWARE.
  *
- * @param  pSPIx  SPI port, for example SPI1, SPI2, SPI3
- * @param  ssm    Slave select management mode
- *
- * @return none
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null port,
+ *         SPI_ERROR_INVALID_PORT for an unsupported SPI port, or
+ *         SPI_ERROR_INVALID_CONFIG for an invalid mode or GPIO setup failure.
  */
-void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
+SPI_Status_t SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
 {
+    if (pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
+    if (pSPIx != SPI1 && pSPIx != SPI2 && pSPIx != SPI3) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+    if (ssm != SPI_SSM_HARDWARE && ssm != SPI_SSM_SOFTWARE) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
     gpio_pinconfig_t spi_pin_config = {0};
     gpio_handle_t spi_pin_gpio_handle = {0};
 
@@ -38,23 +66,23 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
             spi_pin_config.gpio_pinnumber = SPI1_NSS_PIN;
             spi_pin_gpio_handle.pGPIOx = SPI1_NSS_PORT;
             spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-            GPIO_init(&spi_pin_gpio_handle);
+            if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
         }
 
         spi_pin_config.gpio_pinnumber = SPI1_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI1_MISO_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI1_MOSI_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI1_MOSI_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI1_SCK_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI1_SCK_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
     else if (pSPIx == SPI2)
     {
@@ -66,23 +94,23 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
             spi_pin_config.gpio_pinnumber = SPI2_NSS_PIN;
             spi_pin_gpio_handle.pGPIOx = SPI2_NSS_PORT;
             spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-            GPIO_init(&spi_pin_gpio_handle);
+            if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
         }
 
         spi_pin_config.gpio_pinnumber = SPI2_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI2_MISO_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI2_MOSI_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI2_MOSI_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI2_SCK_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI2_SCK_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
     else if (pSPIx == SPI3)
 {
@@ -97,37 +125,46 @@ void SPI_GPIO_pin_setup(SPI_REGDEF_t *pSPIx, uint8_t ssm)
         spi_pin_config.gpio_pinnumber = SPI3_NSS_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_NSS_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
 
         spi_pin_config.gpio_pinnumber = SPI3_MISO_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_MISO_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI3_MOSI_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_MOSI_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
 
         spi_pin_config.gpio_pinnumber = SPI3_SCK_PIN;
         spi_pin_gpio_handle.pGPIOx = SPI3_SCK_PORT;
         spi_pin_gpio_handle.gpio_pinconfig = &spi_pin_config;
-        GPIO_init(&spi_pin_gpio_handle);
+        if (GPIO_init(&spi_pin_gpio_handle) != GPIO_OK) return SPI_ERROR_INVALID_CONFIG;
     }
+    return SPI_OK;
 }
 
 
 /**
- * @brief  This function takes a SPI port name as well as state (0 or 1) and sets up the clock for that particular SPI port 
+ * @brief  Enable or disable the peripheral clock for SPI1-SPI4.
  *
- * @param  pSPIx  pointer to SPI peripheral register structure
- * @param  state  0 or 1 , to turn the clock on or off
+ * @param  pSPIx  SPI1, SPI2, SPI3, or SPI4 (non-null).
+ * @param  state  1 to enable the clock; 0 to disable it.
  *
- * @return        none
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null port,
+ *         SPI_ERROR_INVALID_PORT for an unsupported port, or
+ *         SPI_ERROR_INVALID_CONFIG for a state other than 0 or 1.
  */
-void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
+SPI_Status_t SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
 {
+    if (pSPIx == NULL) return SPI_ERROR_NULL_POINTER;
+    if (pSPIx != SPI1 && pSPIx != SPI2 && pSPIx != SPI3 && pSPIx != SPI4) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+    if (state != 0U && state != 1U) return SPI_ERROR_INVALID_CONFIG;
+
     if (state == 1)
     {
         if (pSPIx == SPI1)
@@ -166,19 +203,30 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
             SPI4_CLCKDI();
         }
     }
+    return SPI_OK;
 }
 
 
 /**
- * @brief  This function takes a pointer to SPI_HANDLE_t  and sets up a SPI port based on the options in that handle struct
+ * @brief  Configure the SPI peripheral and board GPIO pins from a handle.
  *
- * @param  pSPIx  pointer to SPI peripheral handle structure
+ *         Builds CR1 from a zero-valued local configuration and updates the
+ *         SSOE bit in CR2. Enables the SPI peripheral clock and configures
+ *         the required GPIO pins. SPI remains disabled (SPE = 0).
+ *         If pin setup fails, the SPI clock may remain enabled.
  *
- * @return        none
+ * @param  pSPIx  Non-null handle with a non-null SPI port pointer. Board pin
+ *                setup currently supports SPI1-SPI3.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or port,
+ *         or the error status returned by SPI_clk_cfg or SPI_GPIO_pin_setup.
  */
 
- void SPI_init(SPI_HANDLE_t *pSPIx)
+ SPI_Status_t SPI_init(SPI_HANDLE_t *pSPIx)
 {
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
     SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
 
     uint8_t device_mode        = pSPIx->SPI_config.SPI_device_mode;
@@ -188,34 +236,54 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
     uint8_t clock_polarity     = pSPIx->SPI_config.SPI_CPOL;
     uint8_t clock_phase        = pSPIx->SPI_config.SPI_CPHA;
     uint8_t slave_select_mode  = pSPIx->SPI_config.SPI_ssm;
+    uint8_t nss_direction      = pSPIx->SPI_config.SPI_ssoe;
 
-    /* Enable peripheral clock */
-    SPI_clk_cfg(spi_port, 1);
 
-    
     /* Local copy of CR1 configuration */
     uint16_t cr1_register = 0;
+
+    if (slave_select_mode != SPI_SSM_HARDWARE &&
+        slave_select_mode != SPI_SSM_SOFTWARE) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    if (nss_direction != SPI_NSS_INPUT &&
+        nss_direction != SPI_NSS_OUTPUT) {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    /*
+     * NSS output through SSOE is valid only when the peripheral is a master
+     * using hardware slave-select management.
+     */
+    if (nss_direction == SPI_NSS_OUTPUT &&
+        (device_mode != SPI_DEVICE_MODE_MASTER ||
+         slave_select_mode != SPI_SSM_HARDWARE))
+    {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
 
     /* Configure bus mode */
     switch (bus_config)
     {
         case SPI_MODE_FULL_DUPLEX:
+            /* BIDIMODE = 0, RXONLY = 0 */
             break;
 
         case SPI_MODE_SIMPLEX_TX_ONLY:
+            /* BIDIMODE = 0, RXONLY = 0; received data is ignored */
             break;
 
         case SPI_MODE_HALF_DUPLEX:
-            cr1_register |= (1U << 15);   /* BIDIMODE */
+            cr1_register |= (1U << SPI_CR1_BIDIMODE_OFFSET);
             break;
 
         case SPI_MODE_SIMPLEX_RX_ONLY:
-            cr1_register |= (1U << 10);   /* RXONLY */
+            cr1_register |= (1U << SPI_CR1_RXONLY_OFFSET);
             break;
 
         default:
-            /* Invalid configuration */
-            break;
+            return SPI_ERROR_INVALID_CONFIG;
     }
 
     /* Remaining CR1 configuration goes here */
@@ -224,7 +292,7 @@ void SPI_clk_cfg(SPI_REGDEF_t *pSPIx, uint8_t state)
 switch (device_mode)
 {
     case SPI_DEVICE_MODE_MASTER:
-        cr1_register |= (1U << 2);   /* MSTR = 1 */
+        cr1_register |= (1U << SPI_CR1_MSTR_OFFSET);   /* MSTR = 1 */
         break;
 
     case SPI_DEVICE_MODE_SLAVE:
@@ -232,38 +300,36 @@ switch (device_mode)
         break;
 
     default:
-        break;
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
 /* Slave select management */
-if (device_mode == SPI_DEVICE_MODE_MASTER)
+switch (slave_select_mode)
 {
-    switch (slave_select_mode)
-    {
-        case SPI_SSM_HARDWARE:
-            break;
+    case SPI_SSM_HARDWARE:
+        break;
 
-        case SPI_SSM_SOFTWARE:
-            cr1_register |= (1U << 9);   
-            cr1_register |= (1U << 8);   
-            break;
+    case SPI_SSM_SOFTWARE:
+        cr1_register |= (1U << SPI_CR1_SSM_OFFSET);
+        cr1_register |= (1U << SPI_CR1_SSI_OFFSET);
+        break;
 
-        default:
-            break;
-    }
+    default:
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
   /* Data frame format selection*/
 
 switch (data_frame_format) {
         case SPI_DFF_16_BIT:
-           cr1_register |= (1U << 11);
+           cr1_register |= (1U << SPI_CR1_DFF_OFFSET);
            break;
         case SPI_DFF_8_BIT:
+           /* DFF = 0 selects 8-bit data frames. */
            break;
 
         default:
-           break;
+           return SPI_ERROR_INVALID_CONFIG;
 
 }
 
@@ -278,39 +344,34 @@ switch (data_frame_format) {
 110: fPCLK/128
 111: fPCLK/256
 */
-switch (clock_speed) {
-        case SPI_SCLK_DIV2:
-           break;
-        case SPI_SCLK_DIV4:
-           cr1_register |= (1U << 3);
-           break;
-        case SPI_SCLK_DIV8:
-           cr1_register |= (1U << 4);
-           break;
-        case SPI_SCLK_DIV16:
-           cr1_register |= (1U << 3);
-           cr1_register |= (1U << 4);
-           break;
-        case SPI_SCLK_DIV32:
-           cr1_register |= (1U << 5);
-           break;
-        case SPI_SCLK_DIV64:
-           cr1_register |= (1U << 3);
-           cr1_register |= (1U << 5);
-           break;
-         case SPI_SCLK_DIV128:
-           cr1_register |= (1U << 4);
-           cr1_register |= (1U << 5);
-           break;
-         case SPI_SCLK_DIV256:
-           cr1_register |= (1U << 3);
-           cr1_register |= (1U << 4);
-           cr1_register |= (1U << 5);
-           break;
-
-        default:
-           break;
-
+switch (clock_speed)
+{
+    case SPI_SCLK_DIV2:
+        cr1_register |= SPI_CR1_BR_DIV2;
+        break;
+    case SPI_SCLK_DIV4:
+        cr1_register |= SPI_CR1_BR_DIV4;
+        break;
+    case SPI_SCLK_DIV8:
+        cr1_register |= SPI_CR1_BR_DIV8;
+        break;
+    case SPI_SCLK_DIV16:
+        cr1_register |= SPI_CR1_BR_DIV16;
+        break;
+    case SPI_SCLK_DIV32:
+        cr1_register |= SPI_CR1_BR_DIV32;
+        break;
+    case SPI_SCLK_DIV64:
+        cr1_register |= SPI_CR1_BR_DIV64;
+        break;
+    case SPI_SCLK_DIV128:
+        cr1_register |= SPI_CR1_BR_DIV128;
+        break;
+    case SPI_SCLK_DIV256:
+        cr1_register |= SPI_CR1_BR_DIV256;
+        break;
+    default:
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
 
@@ -319,39 +380,345 @@ switch (clock_speed) {
     switch (clock_phase)
     {
         case SPI_CPHA_FIRST_EDGE :
+            /* CPHA = 0 */
             break;
 
         case SPI_CPHA_SECOND_EDGE:
-            cr1_register |= (1U << 0);   /* CPHA = 1 */
+            cr1_register |= (1U << SPI_CR1_CPHA_OFFSET);
             break;
 
         default:
-            break;
+            return SPI_ERROR_INVALID_CONFIG;
     }
    /*clock polarity setup*/
 
    switch (clock_polarity)
 {
     case SPI_CPOL_LOW:
-        /* CPOL = 0 */
+        /* CPOL = 0: clock idles low. */
         break;
 
     case SPI_CPOL_HIGH:
-        cr1_register |= (1U << 1);   /* CPOL = 1 */
+        cr1_register |= (1U << SPI_CR1_CPOL_OFFSET);
         break;
 
     default:
-        break;
+        return SPI_ERROR_INVALID_CONFIG;
 }
 
+/* Enable the SPI clock only after validating configuration values. */
+SPI_Status_t status = SPI_clk_cfg(spi_port, 1U);
+if (status != SPI_OK) return status;
+
+/* Connect board's pins to SPI pins of the MCU */
+status = SPI_GPIO_pin_setup(spi_port, slave_select_mode);
+if (status != SPI_OK) return status;
+
 // write the register to the actual hardware
- spi_port->CR1 = cr1_register;
+spi_port->CR1 = cr1_register;
+
+/*
+ * In master mode with hardware NSS management, SSOE selects whether
+ * the NSS pin is driven as an output. In all other configurations,
+ * keep NSS output disabled.
+ */
+if (device_mode == SPI_DEVICE_MODE_MASTER &&
+    slave_select_mode == SPI_SSM_HARDWARE &&
+    nss_direction == SPI_NSS_OUTPUT)
+{
+    spi_port->CR2 |= (1U << SPI_CR2_SSOE_OFFSET);
+}
+else
+{
+    spi_port->CR2 &= ~(1U << SPI_CR2_SSOE_OFFSET);
+}
+
+return SPI_OK;
+}
+
+/**
+ * @brief  Enable an initialized SPI peripheral.
+ *
+ *         Sets SPE in CR1 while preserving the existing SPI configuration.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_enable(SPI_HANDLE_t *pSPIx)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    if (spi_port != SPI1 && spi_port != SPI2 &&
+        spi_port != SPI3 && spi_port != SPI4) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+
+    spi_port->CR1 |= (1U << SPI_CR1_SPE_OFFSET);
+
+    return SPI_OK;
+}
 
 
-/* Connect board's pins to SPI pins of the MCU*/
-SPI_GPIO_pin_setup(spi_port, slave_select_mode);
+/**
+ * @brief  Clear the SPI peripheral enable bit.
+ *
+ *         Clears SPE in CR1 while preserving the existing SPI configuration.
+ *         This function does not currently perform the transfer-completion
+ *         checks required for safely disabling an active SPI communication.
+ *         The caller must ensure that no transfer is in progress.
+ *
+ * @param  pSPIx  Non-null SPI handle containing SPI1, SPI2, SPI3, or SPI4.
+ *
+ * @return SPI_OK on success, SPI_ERROR_NULL_POINTER for a null handle or
+ *         peripheral pointer, or SPI_ERROR_INVALID_PORT for an unsupported
+ *         peripheral.
+ */
+SPI_Status_t SPI_disable(SPI_HANDLE_t *pSPIx)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL) {
+        return SPI_ERROR_NULL_POINTER;
+    }
 
-/* finally enable SPI*/
-spi_port->CR1 |= (1u << 6);
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
 
+    if (spi_port != SPI1 && spi_port != SPI2 &&
+        spi_port != SPI3 && spi_port != SPI4) {
+        return SPI_ERROR_INVALID_PORT;
+    }
+
+    spi_port->CR1 &= ~(1U << SPI_CR1_SPE_OFFSET);
+
+    return SPI_OK;
+}
+
+
+static SPI_Status_t SPI_set_half_duplex_direction(SPI_HANDLE_t *pSPIx,
+                                                   SPI_Direction_t direction)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL)
+    {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    if (pSPIx->SPI_config.SPI_bus_config != SPI_MODE_HALF_DUPLEX)
+    {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    switch (direction)
+    {
+        case SPI_DIRECTION_TX:
+            pSPIx->pSPIx->CR1 |= (1U << SPI_CR1_BIDIOE_OFFSET);
+            break;
+
+        case SPI_DIRECTION_RX:
+            pSPIx->pSPIx->CR1 &= ~(1U << SPI_CR1_BIDIOE_OFFSET);
+            break;
+
+        default:
+            return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    return SPI_OK;
+}
+
+
+SPI_Status_t SPI_data_exchange(SPI_HANDLE_t *pSPIx,
+                               SPI_Operation_t operation,
+                               const uint8_t *pTxBuffer,
+                               uint8_t *pRxBuffer,
+                               uint32_t length)
+{
+    if (pSPIx == NULL || pSPIx->pSPIx == NULL)
+    {
+        return SPI_ERROR_NULL_POINTER;
+    }
+
+    if (pSPIx->SPI_config.SPI_dff == SPI_DFF_16_BIT)
+    {
+        return SPI_ERROR_UNSUPPORTED;
+    }
+
+    if (pSPIx->SPI_config.SPI_dff != SPI_DFF_8_BIT)
+    {
+        return SPI_ERROR_INVALID_CONFIG;
+    }
+
+    switch (operation)
+    {
+        case SPI_OPERATION_TX:
+            if (pTxBuffer == NULL)
+            {
+                return SPI_ERROR_NULL_POINTER;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_SIMPLEX_RX_ONLY)
+            {
+                return SPI_ERROR_INVALID_OPERATION;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_HALF_DUPLEX)
+            {
+                SPI_Status_t status =
+                    SPI_set_half_duplex_direction(pSPIx, SPI_DIRECTION_TX);
+
+                if (status != SPI_OK)
+                {
+                    return status;
+                }
+            }
+
+            return SPI_tx(pSPIx, pTxBuffer, length);
+
+        case SPI_OPERATION_RX:
+            if (pRxBuffer == NULL)
+            {
+                return SPI_ERROR_NULL_POINTER;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_SIMPLEX_TX_ONLY)
+            {
+                return SPI_ERROR_INVALID_OPERATION;
+            }
+
+            if (pSPIx->SPI_config.SPI_device_mode == SPI_DEVICE_MODE_MASTER)
+            {
+                return SPI_ERROR_UNSUPPORTED;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_HALF_DUPLEX)
+            {
+                SPI_Status_t status =
+                    SPI_set_half_duplex_direction(pSPIx, SPI_DIRECTION_RX);
+
+                if (status != SPI_OK)
+                {
+                    return status;
+                }
+            }
+
+            return SPI_rx(pSPIx, pRxBuffer, length);
+
+        case SPI_OPERATION_EXCHANGE:
+            if (pTxBuffer == NULL || pRxBuffer == NULL)
+            {
+                return SPI_ERROR_NULL_POINTER;
+            }
+
+            if (pSPIx->SPI_config.SPI_bus_config != SPI_MODE_FULL_DUPLEX)
+            {
+                return SPI_ERROR_INVALID_OPERATION;
+            }
+
+            return SPI_exchange(pSPIx, pTxBuffer, pRxBuffer, length);
+
+        default:
+            return SPI_ERROR_INVALID_OPERATION;
+    }
+}
+
+
+static SPI_Status_t SPI_tx(SPI_HANDLE_t *pSPIx,
+                           const uint8_t *pTxBuffer,
+                           uint32_t length)
+{
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    while (length > 0U)
+    {
+        while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+        {
+        }
+
+        *((volatile uint8_t *)&spi_port->DR) = *pTxBuffer;
+
+        pTxBuffer++;
+        length--;
+    }
+
+    while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+    {
+    }
+
+    while (spi_port->SR & (1U << SPI_SR_BSY_OFFSET))
+    {
+    }
+
+    if (pSPIx->SPI_config.SPI_bus_config == SPI_MODE_FULL_DUPLEX)
+    {
+        volatile uint32_t clear_ovr;
+
+        clear_ovr = spi_port->DR;
+        clear_ovr = spi_port->SR;
+        (void)clear_ovr;
+    }
+
+    return SPI_OK;
+}
+
+
+static SPI_Status_t SPI_rx(SPI_HANDLE_t *pSPIx,
+                           uint8_t *pRxBuffer,
+                           uint32_t length)
+{
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    while (length > 0U)
+    {
+        while (!(spi_port->SR & (1U << SPI_SR_RXNE_OFFSET)))
+        {
+        }
+
+        *pRxBuffer = *((volatile uint8_t *)&spi_port->DR);
+
+        pRxBuffer++;
+        length--;
+    }
+
+    return SPI_OK;
+}
+
+
+static SPI_Status_t SPI_exchange(SPI_HANDLE_t *pSPIx,
+                                 const uint8_t *pTxBuffer,
+                                 uint8_t *pRxBuffer,
+                                 uint32_t length)
+{
+    SPI_REGDEF_t *spi_port = pSPIx->pSPIx;
+
+    while (length > 0U)
+    {
+        while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+        {
+        }
+
+        *((volatile uint8_t *)&spi_port->DR) = *pTxBuffer;
+
+        while (!(spi_port->SR & (1U << SPI_SR_RXNE_OFFSET)))
+        {
+        }
+
+        *pRxBuffer = *((volatile uint8_t *)&spi_port->DR);
+
+        pTxBuffer++;
+        pRxBuffer++;
+        length--;
+    }
+
+    while (!(spi_port->SR & (1U << SPI_SR_TXE_OFFSET)))
+    {
+    }
+
+    while (spi_port->SR & (1U << SPI_SR_BSY_OFFSET))
+    {
+    }
+
+    return SPI_OK;
 }

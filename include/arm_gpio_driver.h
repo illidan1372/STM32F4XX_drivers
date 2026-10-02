@@ -4,6 +4,15 @@
 
 #include "arm_stm32f446xx.h"
 #include <stdint.h>
+
+/* GPIO driver operation result */
+typedef enum
+{
+    GPIO_OK = 0,
+    GPIO_ERROR_NULL_POINTER,
+    GPIO_ERROR_INVALID_PORT,
+    GPIO_ERROR_INVALID_CONFIG
+} GPIO_Status_t;
 /* configuration structure for a gpio pin */
 
 typedef struct  
@@ -35,7 +44,7 @@ typedef struct
 // state means enable clock or disable clock
 void GPIO_clk_cfg(GPIO_REGDEF_t *GPIO_port , uint8_t state);                                                         
 // a function to initialise gpio port 
-void GPIO_init(gpio_handle_t *pGPIOx);
+GPIO_Status_t GPIO_init(gpio_handle_t *pGPIOx);
 // a function to de-initialise gpio port
 void GPIO_deinit(GPIO_REGDEF_t *GPIO_port);
 // a function to write to output pin
