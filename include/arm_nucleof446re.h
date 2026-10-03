@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "arm_stm32f446xx.h"
 #include "arm_gpio_driver.h"
+#include "arm_rcc_driver.h"
 
                                             /* board specific peripheral pins*/
 
@@ -56,6 +57,8 @@
 
 #define SPI3_AF            6U
 
+
+RCC_Status_t NUCLEO_F446RE_HSE_enable(void);
 
 void user_LED_set(uint8_t state);
 void user_LED_toggle(void);
