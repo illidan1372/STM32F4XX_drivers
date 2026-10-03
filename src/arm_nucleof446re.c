@@ -1,5 +1,11 @@
 #include <stdint.h>
 #include "arm_gpio_driver.h"
+#include "arm_rcc_driver.h"
+RCC_Status_t NUCLEO_F446RE_HSE_enable(void)
+{
+     return RCC_HSE_enable(RCC_HSE_EXTERNAL_CLOCK);
+}
+
 void user_LED_set(uint8_t state)
 {
      GPIO_clk_cfg(GPIOA,1);
