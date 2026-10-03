@@ -166,6 +166,7 @@ typedef struct
 #define RCC_CR_HSIRDY_OFFSET  1U
 #define RCC_CR_HSEON_OFFSET   16U
 #define RCC_CR_HSERDY_OFFSET  17U
+#define RCC_CR_HSEBYP_OFFSET  18U
 
 
 /* this is a struct that represents the EXTI peripheral registers
