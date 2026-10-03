@@ -8,8 +8,14 @@ typedef enum
     RCC_ERROR_TIMEOUT
 } RCC_Status_t;
 
+typedef enum
+{
+    RCC_HSE_CRYSTAL = 0,
+    RCC_HSE_EXTERNAL_CLOCK
+} RCC_HSE_Source_t;
+
 RCC_Status_t RCC_HSI_enable(void);
-RCC_Status_t RCC_HSE_enable(void);
+RCC_Status_t RCC_HSE_enable(RCC_HSE_Source_t source);
 RCC_Status_t RCC_HSI_disable(void);
 RCC_Status_t RCC_HSE_disable(void);
 
