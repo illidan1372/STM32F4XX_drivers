@@ -161,6 +161,12 @@ typedef struct
     volatile uint32_t RCC_DCK_CFGR2;
 }RCC_REGDEF_t;
 
+/* RCC clock control register bit positions */
+#define RCC_CR_HSION_OFFSET   0U
+#define RCC_CR_HSIRDY_OFFSET  1U
+#define RCC_CR_HSEON_OFFSET   16U
+#define RCC_CR_HSERDY_OFFSET  17U
+
 
 /* this is a struct that represents the EXTI peripheral registers
 of the microcontroller
