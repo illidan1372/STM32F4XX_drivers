@@ -86,6 +86,43 @@ static RCC_Status_t RCC_HSE_bypass_enable(void)
     return RCC_OK;
 }
 
+RCC_Status_t RCC_SYSCLK_select(RCC_SYSCLK_Source_t source)
+{
+    uint32_t timeout_period = RCC_STARTUP_TIMEOUT;
+
+    switch (source)
+    {
+        case RCC_SYSCLK_HSI:
+        case RCC_SYSCLK_HSE:
+        case RCC_SYSCLK_PLL_P:
+        case RCC_SYSCLK_PLL_R:
+            break;
+
+        default:
+            return RCC_ERROR_INVALID_CONFIG;
+    }
+
+    /* Clear SW[1:0]. */
+    RCC->RCC_CFGR &= ~RCC_CFGR_SW_MASK;
+
+    /* Write the requested source into SW[1:0]. */
+    RCC->RCC_CFGR |= ((uint32_t)source << RCC_CFGR_SW_OFFSET);
+
+    /* Wait until SWS[1:0] confirms the selected SYSCLK source. */
+    while ((RCC->RCC_CFGR & RCC_CFGR_SWS_MASK)
+           != ((uint32_t)source << RCC_CFGR_SWS_OFFSET))
+    {
+        if (timeout_period == 0U)
+        {
+            return RCC_ERROR_TIMEOUT;
+        }
+
+        timeout_period -= 1U;
+    }
+
+    return RCC_OK;
+}
+
 RCC_Status_t RCC_HSI_disable(void)
 {
     uint32_t timeout_period = RCC_STARTUP_TIMEOUT;
