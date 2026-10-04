@@ -168,6 +168,12 @@ typedef struct
 #define RCC_CR_HSERDY_OFFSET  17U
 #define RCC_CR_HSEBYP_OFFSET  18U
 
+/* RCC clock configuration register bit positions and masks */
+#define RCC_CFGR_SW_OFFSET     0U
+#define RCC_CFGR_SWS_OFFSET    2U
+#define RCC_CFGR_SW_MASK       (0x3U << RCC_CFGR_SW_OFFSET)
+#define RCC_CFGR_SWS_MASK      (0x3U << RCC_CFGR_SWS_OFFSET)
+
 
 /* this is a struct that represents the EXTI peripheral registers
 of the microcontroller
