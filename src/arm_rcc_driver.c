@@ -86,6 +86,48 @@ static RCC_Status_t RCC_HSE_bypass_enable(void)
     return RCC_OK;
 }
 
+RCC_Status_t RCC_PLL_source_select(RCC_PLL_Source_t source)
+{
+    switch (source)
+    {
+        case RCC_PLL_SOURCE_HSI:
+        case RCC_PLL_SOURCE_HSE:
+            break;
+
+        default:
+            return RCC_ERROR_INVALID_CONFIG;
+    }
+
+    /* PLLSRC is shared by PLL, PLLI2S and PLLSAI. */
+    if ((RCC->RCC_CR & ((1U << RCC_CR_PLLON_OFFSET)
+                      | (1U << RCC_CR_PLLI2SON_OFFSET)
+                      | (1U << RCC_CR_PLLSAION_OFFSET))) != 0U)
+    {
+        return RCC_ERROR_INVALID_CONFIG;
+    }
+
+    if (source == RCC_PLL_SOURCE_HSI)
+    {
+        if ((RCC->RCC_CR & (1U << RCC_CR_HSIRDY_OFFSET)) == 0U)
+        {
+            return RCC_ERROR_INVALID_CONFIG;
+        }
+
+        RCC->RCC_PLL_CFGR &= ~RCC_PLLCFGR_PLLSRC_MASK;
+    }
+    else
+    {
+        if ((RCC->RCC_CR & (1U << RCC_CR_HSERDY_OFFSET)) == 0U)
+        {
+            return RCC_ERROR_INVALID_CONFIG;
+        }
+
+        RCC->RCC_PLL_CFGR |= RCC_PLLCFGR_PLLSRC_MASK;
+    }
+
+    return RCC_OK;
+}
+
 RCC_Status_t RCC_SYSCLK_select(RCC_SYSCLK_Source_t source)
 {
     uint32_t timeout_period = RCC_STARTUP_TIMEOUT;

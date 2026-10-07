@@ -167,6 +167,13 @@ typedef struct
 #define RCC_CR_HSEON_OFFSET   16U
 #define RCC_CR_HSERDY_OFFSET  17U
 #define RCC_CR_HSEBYP_OFFSET  18U
+#define RCC_CR_PLLON_OFFSET   24U
+#define RCC_CR_PLLI2SON_OFFSET 26U
+#define RCC_CR_PLLSAION_OFFSET 28U
+
+/* RCC PLL configuration register bit positions and masks */
+#define RCC_PLLCFGR_PLLSRC_OFFSET  22U
+#define RCC_PLLCFGR_PLLSRC_MASK    (1U << RCC_PLLCFGR_PLLSRC_OFFSET)
 
 /* RCC clock configuration register bit positions and masks */
 #define RCC_CFGR_SW_OFFSET     0U
