@@ -51,8 +51,15 @@ This project is being developed to gain a deep understanding of STM32 peripheral
 
   * HSI clock source configuration
   * HSE clock source configuration
-  * PLL configuration
   * System clock source selection
+  * Hardware validation on Nucleo-F446RE:
+    * HSI -> HSE -> HSI SYSCLK switching completed successfully
+    * Final observed state after switching back to HSI and disabling HSE:
+      * SW = 00
+      * SWS = 00
+      * HSEON = 0
+      * HSERDY = 0
+  * PLL configuration
   * SYSCLK frequency configuration
   * AHB clock configuration
   * APB1 clock configuration
