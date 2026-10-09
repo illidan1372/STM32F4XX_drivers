@@ -98,7 +98,15 @@ RCC_Status_t RCC_PLL_source_select(RCC_PLL_Source_t source)
             return RCC_ERROR_INVALID_CONFIG;
     }
 
-    /* PLLSRC is shared by PLL, PLLI2S and PLLSAI. */
+   /*
+ * Build a mask containing the ON bits for PLL, PLLI2S and PLLSAI.
+ * The bitwise OR operator '|' combines the three individual bit masks
+ * into one mask so they can all be checked with a single '&' operation.
+ *
+ * If any of those ON bits are set in RCC_CR, the result of the '&'
+ * operation will be non-zero, meaning at least one PLL is currently enabled.
+ */
+    
     if ((RCC->RCC_CR & ((1U << RCC_CR_PLLON_OFFSET)
                       | (1U << RCC_CR_PLLI2SON_OFFSET)
                       | (1U << RCC_CR_PLLSAION_OFFSET))) != 0U)
