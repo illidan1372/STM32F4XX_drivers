@@ -168,12 +168,28 @@ typedef struct
 #define RCC_CR_HSERDY_OFFSET  17U
 #define RCC_CR_HSEBYP_OFFSET  18U
 #define RCC_CR_PLLON_OFFSET   24U
+#define RCC_CR_PLLRDY_OFFSET  25U
 #define RCC_CR_PLLI2SON_OFFSET 26U
 #define RCC_CR_PLLSAION_OFFSET 28U
 
+/* Main PLL control and ready masks */
+#define RCC_CR_PLLON_MASK          (1U << RCC_CR_PLLON_OFFSET)
+#define RCC_CR_PLLRDY_MASK         (1U << RCC_CR_PLLRDY_OFFSET)
+
 /* RCC PLL configuration register bit positions and masks */
+#define RCC_PLLCFGR_PLLM_OFFSET    0U
+#define RCC_PLLCFGR_PLLN_OFFSET    6U
+#define RCC_PLLCFGR_PLLP_OFFSET    16U
 #define RCC_PLLCFGR_PLLSRC_OFFSET  22U
+#define RCC_PLLCFGR_PLLQ_OFFSET    24U
+#define RCC_PLLCFGR_PLLR_OFFSET    28U
+
+#define RCC_PLLCFGR_PLLM_MASK      (0x3FU  << RCC_PLLCFGR_PLLM_OFFSET)
+#define RCC_PLLCFGR_PLLN_MASK      (0x1FFU << RCC_PLLCFGR_PLLN_OFFSET)
+#define RCC_PLLCFGR_PLLP_MASK      (0x3U   << RCC_PLLCFGR_PLLP_OFFSET)
 #define RCC_PLLCFGR_PLLSRC_MASK    (1U << RCC_PLLCFGR_PLLSRC_OFFSET)
+#define RCC_PLLCFGR_PLLQ_MASK      (0xFU   << RCC_PLLCFGR_PLLQ_OFFSET)
+#define RCC_PLLCFGR_PLLR_MASK      (0x7U   << RCC_PLLCFGR_PLLR_OFFSET)
 
 /* RCC clock configuration register bit positions and masks */
 #define RCC_CFGR_SW_OFFSET     0U
