@@ -100,6 +100,58 @@ This project is being developed to gain a deep understanding of STM32 peripheral
 * OpenOCD
 * GDB
 
+## PLL and System Clock Setup
+
+`RCC_PLL_configure()` validates the PLL factors and VCO/PLLP frequencies,
+then selects regulator voltage scale 1 while the main PLL is disabled.
+Both the active and requested system clock must be HSI or HSE. It does not
+enable the PLL or change SYSCLK. HSI input frequency must be 16 MHz.
+
+`RCC_SYSCLK_select(source, hse_hz, supply_mv)` takes the actual external clock
+frequency in Hz and the guaranteed supply voltage in millivolts (1800–3600).
+`hse_hz` is ignored when using HSI directly or as the PLL input. Use the lowest
+guaranteed voltage over the operating conditions; this function does not measure
+VDD. At voltage-table boundaries the lower-voltage column is used conservatively.
+The internal regulator must be enabled, not bypassed.
+
+The clock switch derives the PLL frequency from its registers, requires its
+oscillator and PLL to be ready, and waits for voltage scale 1 readiness. Above
+168 MHz it enables Over-drive and waits for both ready flags; this requires
+VDD above 2.1 V and HSI/HSE as the current SYSCLK when entering Over-drive.
+Call during initialization, with peripheral consumers stopped and their clocks
+disabled before an Over-drive transition, as required by RM0390.
+
+Flash wait states are raised and read back before increasing HCLK and lowered
+only after the new clock and AHB divider take effect. Prefetch is disabled at
+VDD <= 2.1 V. Every successful switch explicitly selects AHB `/1`, APB1 `/4`,
+and APB2 `/2`, keeping the buses within their 180/45/90 MHz limits. These fixed
+dividers also apply to HSI/HSE switches; reconfigure peripheral timings and
+software timebases accordingly. This driver does not update CMSIS
+`SystemCoreClock` or SysTick. Voltage scale and Over-drive are retained when
+switching down to a slower clock.
+
+For example, with an already enabled 8 MHz HSE and a guaranteed 3.3 V supply,
+check each return status in this sequence:
+
+```c
+status = RCC_PLL_source_select(RCC_PLL_SOURCE_HSE);
+status = RCC_PLL_configure(8000000U, 4U, 180U,
+                           RCC_PLL_P_DIV2, RCC_PLL_Q_DIV8, RCC_PLL_R_DIV2);
+status = RCC_PLL_enable();
+status = RCC_SYSCLK_select(RCC_SYSCLK_PLL_P, 8000000U, 3300U);
+```
+
+This produces HCLK = 180 MHz, APB1 = 45 MHz, APB2 = 90 MHz, and 5 Flash wait
+states. PLLQ is 45 MHz in this example and is not suitable for a 48 MHz USB clock.
+Invalid arguments are rejected before changing clock settings. A readiness
+timeout can leave power settings, increased Flash latency, or conservative bus
+dividers applied. A SYSCLK-switch timeout leaves the request pending: inspect
+SW/SWS before retrying or disabling a clock. Timeouts currently count iterations,
+not elapsed time. Hardware validation of the high-speed sequence is still needed.
+
+Reference: [STM32F446 RM0390](https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf),
+sections on Flash latency, voltage scaling, Over-drive, and RCC prescalers.
+
 ## Project Structure
 
 ```text

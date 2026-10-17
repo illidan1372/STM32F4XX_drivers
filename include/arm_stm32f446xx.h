@@ -83,6 +83,25 @@
 //RCC base address macro
 #define RCC_BASE_ADDR ( AHB1_BASE_ADDR + 0X3800 )
 
+#define FLASH_ACR_REG ((volatile uint32_t *)(AHB1_BASE_ADDR + 0x3C00U))
+#define FLASH_ACR_LATENCY_MASK 0xFU
+#define FLASH_ACR_PRFTEN_MASK (1U << 8U)
+#define PWR_CR_REG ((volatile uint32_t *)(APB1_BASE_ADDR + 0x7000U))
+#define PWR_CSR_REG ((volatile uint32_t *)(APB1_BASE_ADDR + 0x7004U))
+#define PWR_CR_VOS_MASK (3U << 14U)
+#define PWR_CR_VOS_SCALE1 (3U << 14U)
+#define PWR_CR_ODEN_MASK (1U << 16U)
+#define PWR_CR_ODSWEN_MASK (1U << 17U)
+#define PWR_CSR_VOSRDY_MASK (1U << 14U)
+#define PWR_CSR_ODRDY_MASK (1U << 16U)
+#define PWR_CSR_ODSWRDY_MASK (1U << 17U)
+#define RCC_APB1ENR_PWREN_MASK (1U << 28U)
+#define RCC_CFGR_HPRE_MASK (0xFU << 4U)
+#define RCC_CFGR_PPRE1_MASK (7U << 10U)
+#define RCC_CFGR_PPRE2_MASK (7U << 13U)
+#define RCC_CFGR_PPRE1_DIV4 (5U << 10U)
+#define RCC_CFGR_PPRE2_DIV2 (4U << 13U)
+
 // EXTI base address
 #define EXTI_BASE_ADDR ( APB2_BASE_ADDR + 0X3C00 )
 // SYSCFG base address

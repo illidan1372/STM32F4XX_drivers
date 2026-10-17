@@ -12,14 +12,14 @@ int main(void)
         while (1);
     }
 
-    status = RCC_SYSCLK_select(RCC_SYSCLK_HSE);
+    status = RCC_SYSCLK_select(RCC_SYSCLK_HSE, 8000000U, 3300U);
     if (status != RCC_OK)
     {
         user_LED_set(0);
         while (1);
     }
 
-    status = RCC_SYSCLK_select(RCC_SYSCLK_HSI);
+    status = RCC_SYSCLK_select(RCC_SYSCLK_HSI, 8000000U, 3300U);
     if (status != RCC_OK)
     {
         user_LED_set(0);

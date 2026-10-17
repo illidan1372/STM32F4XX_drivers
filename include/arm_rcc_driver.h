@@ -86,7 +86,18 @@ RCC_Status_t RCC_HSI_enable(void);
 RCC_Status_t RCC_HSE_enable(RCC_HSE_Source_t source);
 RCC_Status_t RCC_HSI_disable(void);
 RCC_Status_t RCC_HSE_disable(void);
-RCC_Status_t RCC_SYSCLK_select(RCC_SYSCLK_Source_t source);
+/*
+ * Switch to a ready source using the actual HSE Hz and guaranteed VDD mV.
+ * Sets AHB /1, APB1 /4, APB2 /2 and voltage-dependent Flash latency.
+ * PLL sources require scale 1 prepared by RCC_PLL_configure(). Above
+ * 168 MHz, enable Over-drive while still on HSI/HSE (VDD > 2100 mV).
+ * Call with peripheral consumers stopped; use the internal regulator.
+ * Timeouts can leave preparation applied or a clock switch pending.
+ * Does not update SystemCoreClock, SysTick, or peripheral timing settings.
+ */
+RCC_Status_t RCC_SYSCLK_select(RCC_SYSCLK_Source_t source,
+                               uint32_t hse_hz,
+                               uint32_t supply_mv);
 
 /*
  * Select HSI or HSE through PLLSRC without enabling or disabling clocks.
@@ -102,6 +113,9 @@ RCC_Status_t RCC_PLL_source_select(RCC_PLL_Source_t source);
  * RCC_PLL_source_select().
  * Validate all factors and resulting VCO/P frequencies before writing.
  * Preserve PLLSRC and reserved bits; leave the register unchanged on error.
+ * Require HSI/HSE as both the active and requested SYSCLK source.
+ * Enable the PWR clock and select voltage scale 1 while PLL is off.
+ * Voltage-scale readiness is checked by RCC_SYSCLK_select() after PLL enable.
  * Peripheral-specific output requirements remain the caller's responsibility.
  */
 RCC_Status_t RCC_PLL_configure(uint32_t source_hz,
