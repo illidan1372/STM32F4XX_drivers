@@ -136,6 +136,75 @@ RCC_Status_t RCC_PLL_source_select(RCC_PLL_Source_t source)
     return RCC_OK;
 }
 
+/*
+ * TODO[POST-TIMER]:
+ * Replace the iteration-count PLL ready wait with a timer-based timeout
+ * once the timer drivers are ready, so the timeout measures elapsed time
+ * rather than a CPU-speed-dependent number of loop iterations.
+ */
+RCC_Status_t RCC_PLL_enable(void)
+{
+    uint32_t timeout_period = RCC_STARTUP_TIMEOUT;
+    uint32_t pll_config = RCC->RCC_PLL_CFGR;
+    uint32_t m = (pll_config & RCC_PLLCFGR_PLLM_MASK)
+                 >> RCC_PLLCFGR_PLLM_OFFSET;
+    uint32_t n = (pll_config & RCC_PLLCFGR_PLLN_MASK)
+                 >> RCC_PLLCFGR_PLLN_OFFSET;
+    uint32_t q = (pll_config & RCC_PLLCFGR_PLLQ_MASK)
+                 >> RCC_PLLCFGR_PLLQ_OFFSET;
+    uint32_t r = (pll_config & RCC_PLLCFGR_PLLR_MASK)
+                 >> RCC_PLLCFGR_PLLR_OFFSET;
+    uint32_t source_ready_mask;
+
+    /* Every two-bit PLLP encoding is valid; check the other factors. */
+    if ((m < RCC_PLL_M_MIN) || (m > RCC_PLL_M_MAX)
+        || (n < RCC_PLL_N_MIN) || (n > RCC_PLL_N_MAX)
+        || (q < RCC_PLL_Q_DIV2) || (q > RCC_PLL_Q_DIV15)
+        || (r < RCC_PLL_R_DIV2) || (r > RCC_PLL_R_DIV7))
+    {
+        return RCC_ERROR_INVALID_CONFIG;
+    }
+
+    /*
+     * Hardware defines PLLSRC = 0 as HSI and PLLSRC = 1 as HSE.
+     * Isolate this bit to identify the PLL input oscillator, then select
+     * its RDY flag so we can check that it is ready before enabling PLL.
+     * This only prepares a mask; it does not change the clock source.
+     */
+    if ((pll_config & RCC_PLLCFGR_PLLSRC_MASK) == 0U)
+    {
+        source_ready_mask = (1U << RCC_CR_HSIRDY_OFFSET);
+    }
+    else
+    {
+        source_ready_mask = (1U << RCC_CR_HSERDY_OFFSET);
+    }
+
+    if ((RCC->RCC_CR & source_ready_mask) == 0U)
+    {
+        return RCC_ERROR_INVALID_CONFIG;
+    }
+
+    /*
+     * Set PLLON (bit 24) to enable the main PLL, preserving the other bits.
+     * Enabling starts the PLL; the wait below checks PLLRDY for lock.
+     */
+    RCC->RCC_CR |= RCC_CR_PLLON_MASK;
+
+    /* This also handles a PLL that is already enabled and locking. */
+    while ((RCC->RCC_CR & RCC_CR_PLLRDY_MASK) == 0U)
+    {
+        if (timeout_period == 0U)
+        {
+            return RCC_ERROR_TIMEOUT;
+        }
+
+        timeout_period -= 1U;
+    }
+
+    return RCC_OK;
+}
+
 RCC_Status_t RCC_SYSCLK_select(RCC_SYSCLK_Source_t source)
 {
     uint32_t timeout_period = RCC_STARTUP_TIMEOUT;

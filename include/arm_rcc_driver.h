@@ -112,8 +112,12 @@ RCC_Status_t RCC_PLL_configure(uint32_t source_hz,
                                RCC_PLL_R_Divider_t r);
 
 /*
- * Require a ready input oscillator and valid PLL configuration.
- * Enable the main PLL and wait for PLLRDY, with a timeout.
+ * Check the stored factor ranges and require the selected oscillator ready.
+ * The caller must ensure frequency constraints are satisfied beforehand
+ * (RCC_PLL_configure() is intended to perform those checks).
+ * Enable the main PLL and wait for PLLRDY, with a timeout. An already locked
+ * PLL returns RCC_OK after validation. Invalid configuration leaves registers
+ * unchanged; a timeout leaves PLLON set, matching oscillator enable behavior.
  */
 RCC_Status_t RCC_PLL_enable(void);
 
