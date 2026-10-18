@@ -167,6 +167,12 @@ RCC_Status_t RCC_PLL_configure(uint32_t source_hz,
     uint32_t p_divisor;
     uint32_t pll_config;
 
+    /*
+     * PLLP uses register encodings 0..3 for actual divisors 2, 4, 6, 8.
+     * RCC_PLL_P_DIV8 is the enum value 3, not the number 8.
+     * Casting p to uint32_t also rejects negative enum inputs: e.g., -1
+     * becomes a large unsigned number and fails the upper-bound check.
+     */
     if ((m < RCC_PLL_M_MIN) || (m > RCC_PLL_M_MAX)
         || (n < RCC_PLL_N_MIN) || (n > RCC_PLL_N_MAX)
         || ((uint32_t)p > (uint32_t)RCC_PLL_P_DIV8)
