@@ -184,7 +184,12 @@ RCC_Status_t RCC_PLL_configure(uint32_t source_hz,
         return RCC_ERROR_INVALID_CONFIG;
     }
 
-    /* PLLP stores 0/1/2/3 for division by 2/4/6/8. */
+    /*
+     * PLLP stores an encoding, not the divisor itself:
+     * p = 0, 1, 2, 3 represents division by 2, 4, 6, 8 respectively.
+     * These divisors follow P = 2 * (p + 1); for example, encoding 1
+     * (RCC_PLL_P_DIV4) gives P = 2 * (1 + 1) = 4.
+     */
     p_divisor = 2U * ((uint32_t)p + 1U);
     vco_numerator = (uint64_t)source_hz * n;
 
