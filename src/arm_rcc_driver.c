@@ -191,6 +191,14 @@ RCC_Status_t RCC_PLL_configure(uint32_t source_hz,
      * (RCC_PLL_P_DIV4) gives P = 2 * (1 + 1) = 4.
      */
     p_divisor = 2U * ((uint32_t)p + 1U);
+    /*
+     * VCO output frequency is f_VCO = (source_hz * N) / M.
+     * Save the numerator here; the frequency checks below compare it
+     * against limits multiplied by M, avoiding integer division/truncation.
+     * Cast source_hz to uint64_t BEFORE multiplying: e.g. 16 MHz * 336
+     * = 5,376,000,000, which overflows uint32_t even though dividing
+     * by M = 16 gives a valid 336 MHz VCO frequency.
+     */
     vco_numerator = (uint64_t)source_hz * n;
 
     /*
